@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"boilerplate/db"
+	"infinote/db"
 )
 
 // UserNotesLoaderConfig captures the config to create a new UserNotesLoader

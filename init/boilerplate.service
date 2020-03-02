@@ -1,12 +1,12 @@
 [Unit]
-Description=Wholesolme
+Description=Infinote
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/usr/share/boilerplate/platform/config/
-ExecStart=/usr/share/boilerplate/platform/bin/server
+WorkingDirectory=/usr/share/infinote/platform/config/
+ExecStart=/usr/share/infinote/platform/bin/server
 Restart=always
 
 [Install]

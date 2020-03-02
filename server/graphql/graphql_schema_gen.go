@@ -3,10 +3,10 @@
 package graphql
 
 import (
-	"boilerplate/db"
 	"bytes"
 	"context"
 	"errors"
+	"infinote/db"
 	"io"
 	"strconv"
 	"sync"
@@ -767,7 +767,7 @@ func (ec *executionContext) dir_hasPerm_args(ctx context.Context, rawArgs map[st
 	args := map[string]interface{}{}
 	var arg0 Perm
 	if tmp, ok := rawArgs["perm"]; ok {
-		arg0, err = ec.unmarshalNPerm2boilerplateᚋgraphqlᚐPerm(ctx, tmp)
+		arg0, err = ec.unmarshalNPerm2infinoteᚋgraphqlᚐPerm(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -781,7 +781,7 @@ func (ec *executionContext) field_Mutation_NoteChange_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 NoteChange
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNNoteChange2boilerplateᚋgraphqlᚐNoteChange(ctx, tmp)
+		arg0, err = ec.unmarshalNNoteChange2infinoteᚋgraphqlᚐNoteChange(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -795,7 +795,7 @@ func (ec *executionContext) field_Mutation_NoteCreate_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 CreateNote
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNCreateNote2boilerplateᚋgraphqlᚐCreateNote(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateNote2infinoteᚋgraphqlᚐCreateNote(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -809,7 +809,7 @@ func (ec *executionContext) field_Mutation_NoteUpdate_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 UpdateNote
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNUpdateNote2boilerplateᚋgraphqlᚐUpdateNote(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateNote2infinoteᚋgraphqlᚐUpdateNote(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -823,7 +823,7 @@ func (ec *executionContext) field_Mutation_RequestToken_args(ctx context.Context
 	args := map[string]interface{}{}
 	var arg0 *RequestToken
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalORequestToken2ᚖboilerplateᚋgraphqlᚐRequestToken(ctx, tmp)
+		arg0, err = ec.unmarshalORequestToken2ᚖinfinoteᚋgraphqlᚐRequestToken(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1040,7 +1040,7 @@ func (ec *executionContext) _Company_users(ctx context.Context, field graphql.Co
 	res := resTmp.([]*db.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚕᚖboilerplateᚋdbᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖinfinoteᚋdbᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CursorPlacement_lineNumber(ctx context.Context, field graphql.CollectedField, obj *CursorPlacement) (ret graphql.Marshaler) {
@@ -1276,7 +1276,7 @@ func (ec *executionContext) _Mutation_NoteCreate(ctx context.Context, field grap
 	res := resTmp.(*db.Note)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNote2ᚖboilerplateᚋdbᚐNote(ctx, field.Selections, res)
+	return ec.marshalNNote2ᚖinfinoteᚋdbᚐNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_NoteUpdate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1320,7 +1320,7 @@ func (ec *executionContext) _Mutation_NoteUpdate(ctx context.Context, field grap
 	res := resTmp.(*db.Note)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNote2ᚖboilerplateᚋdbᚐNote(ctx, field.Selections, res)
+	return ec.marshalNNote2ᚖinfinoteᚋdbᚐNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_NoteChange(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1364,7 +1364,7 @@ func (ec *executionContext) _Mutation_NoteChange(ctx context.Context, field grap
 	res := resTmp.(*NoteEventResult)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNoteEventResult2ᚖboilerplateᚋgraphqlᚐNoteEventResult(ctx, field.Selections, res)
+	return ec.marshalNNoteEventResult2ᚖinfinoteᚋgraphqlᚐNoteEventResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Note_id(ctx context.Context, field graphql.CollectedField, obj *db.Note) (ret graphql.Marshaler) {
@@ -1549,7 +1549,7 @@ func (ec *executionContext) _Note_owner(ctx context.Context, field graphql.Colle
 	res := resTmp.(*db.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚖboilerplateᚋdbᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖinfinoteᚋdbᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NoteEvent_noteID(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
@@ -1657,7 +1657,7 @@ func (ec *executionContext) _NoteEvent_insert(ctx context.Context, field graphql
 	res := resTmp.(*TextInsert)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOTextInsert2ᚖboilerplateᚋgraphqlᚐTextInsert(ctx, field.Selections, res)
+	return ec.marshalOTextInsert2ᚖinfinoteᚋgraphqlᚐTextInsert(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NoteEvent_cursor(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
@@ -1691,7 +1691,7 @@ func (ec *executionContext) _NoteEvent_cursor(ctx context.Context, field graphql
 	res := resTmp.(*CursorPlacement)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOCursorPlacement2ᚖboilerplateᚋgraphqlᚐCursorPlacement(ctx, field.Selections, res)
+	return ec.marshalOCursorPlacement2ᚖinfinoteᚋgraphqlᚐCursorPlacement(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NoteEvent_userID(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
@@ -1876,7 +1876,7 @@ func (ec *executionContext) _NotesConnection_edges(ctx context.Context, field gr
 	res := resTmp.([]*NotesEdge)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNotesEdge2ᚕᚖboilerplateᚋgraphqlᚐNotesEdgeᚄ(ctx, field.Selections, res)
+	return ec.marshalNNotesEdge2ᚕᚖinfinoteᚋgraphqlᚐNotesEdgeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NotesConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *NotesConnection) (ret graphql.Marshaler) {
@@ -1913,7 +1913,7 @@ func (ec *executionContext) _NotesConnection_pageInfo(ctx context.Context, field
 	res := resTmp.(*PageInfo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNPageInfo2ᚖboilerplateᚋgraphqlᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2ᚖinfinoteᚋgraphqlᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NotesEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *NotesEdge) (ret graphql.Marshaler) {
@@ -1984,7 +1984,7 @@ func (ec *executionContext) _NotesEdge_node(ctx context.Context, field graphql.C
 	res := resTmp.(*db.Note)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalONote2ᚖboilerplateᚋdbᚐNote(ctx, field.Selections, res)
+	return ec.marshalONote2ᚖinfinoteᚋdbᚐNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *PageInfo) (ret graphql.Marshaler) {
@@ -2095,7 +2095,7 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 	res := resTmp.(*db.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚖboilerplateᚋdbᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖinfinoteᚋdbᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_Companys(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2132,7 +2132,7 @@ func (ec *executionContext) _Query_Companys(ctx context.Context, field graphql.C
 	res := resTmp.([]*db.Company)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNCompany2ᚕᚖboilerplateᚋdbᚐCompanyᚄ(ctx, field.Selections, res)
+	return ec.marshalNCompany2ᚕᚖinfinoteᚋdbᚐCompanyᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2169,7 +2169,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*db.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚕᚖboilerplateᚋdbᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖinfinoteᚋdbᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_Notes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2206,7 +2206,7 @@ func (ec *executionContext) _Query_Notes(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*db.Note)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNote2ᚕᚖboilerplateᚋdbᚐNoteᚄ(ctx, field.Selections, res)
+	return ec.marshalNNote2ᚕᚖinfinoteᚋdbᚐNoteᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_noteByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2247,7 +2247,7 @@ func (ec *executionContext) _Query_noteByID(ctx context.Context, field graphql.C
 	res := resTmp.(*db.Note)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalONote2ᚖboilerplateᚋdbᚐNote(ctx, field.Selections, res)
+	return ec.marshalONote2ᚖinfinoteᚋdbᚐNote(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2372,7 +2372,7 @@ func (ec *executionContext) _Subscription_NoteEvent(ctx context.Context, field g
 			w.Write([]byte{'{'})
 			graphql.MarshalString(field.Alias).MarshalGQL(w)
 			w.Write([]byte{':'})
-			ec.marshalNNoteEvent2ᚖboilerplateᚋgraphqlᚐNoteEvent(ctx, field.Selections, res).MarshalGQL(w)
+			ec.marshalNNoteEvent2ᚖinfinoteᚋgraphqlᚐNoteEvent(ctx, field.Selections, res).MarshalGQL(w)
 			w.Write([]byte{'}'})
 		})
 	}
@@ -2597,7 +2597,7 @@ func (ec *executionContext) _User_Company(ctx context.Context, field graphql.Col
 	res := resTmp.(*db.Company)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNCompany2ᚖboilerplateᚋdbᚐCompany(ctx, field.Selections, res)
+	return ec.marshalNCompany2ᚖinfinoteᚋdbᚐCompany(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_verified(ctx context.Context, field graphql.CollectedField, obj *db.User) (ret graphql.Marshaler) {
@@ -2678,7 +2678,7 @@ func (ec *executionContext) _User_NotesConnection(ctx context.Context, field gra
 	res := resTmp.(*NotesConnection)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNotesConnection2ᚖboilerplateᚋgraphqlᚐNotesConnection(ctx, field.Selections, res)
+	return ec.marshalNNotesConnection2ᚖinfinoteᚋgraphqlᚐNotesConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_Notes(ctx context.Context, field graphql.CollectedField, obj *db.User) (ret graphql.Marshaler) {
@@ -2715,7 +2715,7 @@ func (ec *executionContext) _User_Notes(ctx context.Context, field graphql.Colle
 	res := resTmp.([]*db.Note)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNNote2ᚕᚖboilerplateᚋdbᚐNoteᚄ(ctx, field.Selections, res)
+	return ec.marshalNNote2ᚕᚖinfinoteᚋdbᚐNoteᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3961,13 +3961,13 @@ func (ec *executionContext) unmarshalInputNoteChange(ctx context.Context, obj in
 			}
 		case "insert":
 			var err error
-			it.Insert, err = ec.unmarshalOInsertNote2ᚖboilerplateᚋgraphqlᚐInsertNote(ctx, v)
+			it.Insert, err = ec.unmarshalOInsertNote2ᚖinfinoteᚋgraphqlᚐInsertNote(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "cursor":
 			var err error
-			it.Cursor, err = ec.unmarshalOCursorInput2ᚖboilerplateᚋgraphqlᚐCursorInput(ctx, v)
+			it.Cursor, err = ec.unmarshalOCursorInput2ᚖinfinoteᚋgraphqlᚐCursorInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4886,11 +4886,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCompany2boilerplateᚋdbᚐCompany(ctx context.Context, sel ast.SelectionSet, v db.Company) graphql.Marshaler {
+func (ec *executionContext) marshalNCompany2infinoteᚋdbᚐCompany(ctx context.Context, sel ast.SelectionSet, v db.Company) graphql.Marshaler {
 	return ec._Company(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompany2ᚕᚖboilerplateᚋdbᚐCompanyᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.Company) graphql.Marshaler {
+func (ec *executionContext) marshalNCompany2ᚕᚖinfinoteᚋdbᚐCompanyᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.Company) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4914,7 +4914,7 @@ func (ec *executionContext) marshalNCompany2ᚕᚖboilerplateᚋdbᚐCompanyᚄ(
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCompany2ᚖboilerplateᚋdbᚐCompany(ctx, sel, v[i])
+			ret[i] = ec.marshalNCompany2ᚖinfinoteᚋdbᚐCompany(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4927,7 +4927,7 @@ func (ec *executionContext) marshalNCompany2ᚕᚖboilerplateᚋdbᚐCompanyᚄ(
 	return ret
 }
 
-func (ec *executionContext) marshalNCompany2ᚖboilerplateᚋdbᚐCompany(ctx context.Context, sel ast.SelectionSet, v *db.Company) graphql.Marshaler {
+func (ec *executionContext) marshalNCompany2ᚖinfinoteᚋdbᚐCompany(ctx context.Context, sel ast.SelectionSet, v *db.Company) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4937,7 +4937,7 @@ func (ec *executionContext) marshalNCompany2ᚖboilerplateᚋdbᚐCompany(ctx co
 	return ec._Company(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateNote2boilerplateᚋgraphqlᚐCreateNote(ctx context.Context, v interface{}) (CreateNote, error) {
+func (ec *executionContext) unmarshalNCreateNote2infinoteᚋgraphqlᚐCreateNote(ctx context.Context, v interface{}) (CreateNote, error) {
 	return ec.unmarshalInputCreateNote(ctx, v)
 }
 
@@ -4969,11 +4969,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNNote2boilerplateᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v db.Note) graphql.Marshaler {
+func (ec *executionContext) marshalNNote2infinoteᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v db.Note) graphql.Marshaler {
 	return ec._Note(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNote2ᚕᚖboilerplateᚋdbᚐNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.Note) graphql.Marshaler {
+func (ec *executionContext) marshalNNote2ᚕᚖinfinoteᚋdbᚐNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.Note) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4997,7 +4997,7 @@ func (ec *executionContext) marshalNNote2ᚕᚖboilerplateᚋdbᚐNoteᚄ(ctx co
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNNote2ᚖboilerplateᚋdbᚐNote(ctx, sel, v[i])
+			ret[i] = ec.marshalNNote2ᚖinfinoteᚋdbᚐNote(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5010,7 +5010,7 @@ func (ec *executionContext) marshalNNote2ᚕᚖboilerplateᚋdbᚐNoteᚄ(ctx co
 	return ret
 }
 
-func (ec *executionContext) marshalNNote2ᚖboilerplateᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v *db.Note) graphql.Marshaler {
+func (ec *executionContext) marshalNNote2ᚖinfinoteᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v *db.Note) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5020,15 +5020,15 @@ func (ec *executionContext) marshalNNote2ᚖboilerplateᚋdbᚐNote(ctx context.
 	return ec._Note(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNNoteChange2boilerplateᚋgraphqlᚐNoteChange(ctx context.Context, v interface{}) (NoteChange, error) {
+func (ec *executionContext) unmarshalNNoteChange2infinoteᚋgraphqlᚐNoteChange(ctx context.Context, v interface{}) (NoteChange, error) {
 	return ec.unmarshalInputNoteChange(ctx, v)
 }
 
-func (ec *executionContext) marshalNNoteEvent2boilerplateᚋgraphqlᚐNoteEvent(ctx context.Context, sel ast.SelectionSet, v NoteEvent) graphql.Marshaler {
+func (ec *executionContext) marshalNNoteEvent2infinoteᚋgraphqlᚐNoteEvent(ctx context.Context, sel ast.SelectionSet, v NoteEvent) graphql.Marshaler {
 	return ec._NoteEvent(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNoteEvent2ᚖboilerplateᚋgraphqlᚐNoteEvent(ctx context.Context, sel ast.SelectionSet, v *NoteEvent) graphql.Marshaler {
+func (ec *executionContext) marshalNNoteEvent2ᚖinfinoteᚋgraphqlᚐNoteEvent(ctx context.Context, sel ast.SelectionSet, v *NoteEvent) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5038,11 +5038,11 @@ func (ec *executionContext) marshalNNoteEvent2ᚖboilerplateᚋgraphqlᚐNoteEve
 	return ec._NoteEvent(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNNoteEventResult2boilerplateᚋgraphqlᚐNoteEventResult(ctx context.Context, sel ast.SelectionSet, v NoteEventResult) graphql.Marshaler {
+func (ec *executionContext) marshalNNoteEventResult2infinoteᚋgraphqlᚐNoteEventResult(ctx context.Context, sel ast.SelectionSet, v NoteEventResult) graphql.Marshaler {
 	return ec._NoteEventResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNoteEventResult2ᚖboilerplateᚋgraphqlᚐNoteEventResult(ctx context.Context, sel ast.SelectionSet, v *NoteEventResult) graphql.Marshaler {
+func (ec *executionContext) marshalNNoteEventResult2ᚖinfinoteᚋgraphqlᚐNoteEventResult(ctx context.Context, sel ast.SelectionSet, v *NoteEventResult) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5052,11 +5052,11 @@ func (ec *executionContext) marshalNNoteEventResult2ᚖboilerplateᚋgraphqlᚐN
 	return ec._NoteEventResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNNotesConnection2boilerplateᚋgraphqlᚐNotesConnection(ctx context.Context, sel ast.SelectionSet, v NotesConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNNotesConnection2infinoteᚋgraphqlᚐNotesConnection(ctx context.Context, sel ast.SelectionSet, v NotesConnection) graphql.Marshaler {
 	return ec._NotesConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNotesConnection2ᚖboilerplateᚋgraphqlᚐNotesConnection(ctx context.Context, sel ast.SelectionSet, v *NotesConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNNotesConnection2ᚖinfinoteᚋgraphqlᚐNotesConnection(ctx context.Context, sel ast.SelectionSet, v *NotesConnection) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5066,11 +5066,11 @@ func (ec *executionContext) marshalNNotesConnection2ᚖboilerplateᚋgraphqlᚐN
 	return ec._NotesConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNNotesEdge2boilerplateᚋgraphqlᚐNotesEdge(ctx context.Context, sel ast.SelectionSet, v NotesEdge) graphql.Marshaler {
+func (ec *executionContext) marshalNNotesEdge2infinoteᚋgraphqlᚐNotesEdge(ctx context.Context, sel ast.SelectionSet, v NotesEdge) graphql.Marshaler {
 	return ec._NotesEdge(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNotesEdge2ᚕᚖboilerplateᚋgraphqlᚐNotesEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*NotesEdge) graphql.Marshaler {
+func (ec *executionContext) marshalNNotesEdge2ᚕᚖinfinoteᚋgraphqlᚐNotesEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*NotesEdge) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5094,7 +5094,7 @@ func (ec *executionContext) marshalNNotesEdge2ᚕᚖboilerplateᚋgraphqlᚐNote
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNNotesEdge2ᚖboilerplateᚋgraphqlᚐNotesEdge(ctx, sel, v[i])
+			ret[i] = ec.marshalNNotesEdge2ᚖinfinoteᚋgraphqlᚐNotesEdge(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5107,7 +5107,7 @@ func (ec *executionContext) marshalNNotesEdge2ᚕᚖboilerplateᚋgraphqlᚐNote
 	return ret
 }
 
-func (ec *executionContext) marshalNNotesEdge2ᚖboilerplateᚋgraphqlᚐNotesEdge(ctx context.Context, sel ast.SelectionSet, v *NotesEdge) graphql.Marshaler {
+func (ec *executionContext) marshalNNotesEdge2ᚖinfinoteᚋgraphqlᚐNotesEdge(ctx context.Context, sel ast.SelectionSet, v *NotesEdge) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5117,11 +5117,11 @@ func (ec *executionContext) marshalNNotesEdge2ᚖboilerplateᚋgraphqlᚐNotesEd
 	return ec._NotesEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPageInfo2boilerplateᚋgraphqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v PageInfo) graphql.Marshaler {
+func (ec *executionContext) marshalNPageInfo2infinoteᚋgraphqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v PageInfo) graphql.Marshaler {
 	return ec._PageInfo(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPageInfo2ᚖboilerplateᚋgraphqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *PageInfo) graphql.Marshaler {
+func (ec *executionContext) marshalNPageInfo2ᚖinfinoteᚋgraphqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *PageInfo) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5131,12 +5131,12 @@ func (ec *executionContext) marshalNPageInfo2ᚖboilerplateᚋgraphqlᚐPageInfo
 	return ec._PageInfo(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPerm2boilerplateᚋgraphqlᚐPerm(ctx context.Context, v interface{}) (Perm, error) {
+func (ec *executionContext) unmarshalNPerm2infinoteᚋgraphqlᚐPerm(ctx context.Context, v interface{}) (Perm, error) {
 	var res Perm
 	return res, res.UnmarshalGQL(v)
 }
 
-func (ec *executionContext) marshalNPerm2boilerplateᚋgraphqlᚐPerm(ctx context.Context, sel ast.SelectionSet, v Perm) graphql.Marshaler {
+func (ec *executionContext) marshalNPerm2infinoteᚋgraphqlᚐPerm(ctx context.Context, sel ast.SelectionSet, v Perm) graphql.Marshaler {
 	return v
 }
 
@@ -5154,15 +5154,15 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateNote2boilerplateᚋgraphqlᚐUpdateNote(ctx context.Context, v interface{}) (UpdateNote, error) {
+func (ec *executionContext) unmarshalNUpdateNote2infinoteᚋgraphqlᚐUpdateNote(ctx context.Context, v interface{}) (UpdateNote, error) {
 	return ec.unmarshalInputUpdateNote(ctx, v)
 }
 
-func (ec *executionContext) marshalNUser2boilerplateᚋdbᚐUser(ctx context.Context, sel ast.SelectionSet, v db.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2infinoteᚋdbᚐUser(ctx context.Context, sel ast.SelectionSet, v db.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖboilerplateᚋdbᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖinfinoteᚋdbᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5186,7 +5186,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖboilerplateᚋdbᚐUserᚄ(ctx co
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖboilerplateᚋdbᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2ᚖinfinoteᚋdbᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5199,7 +5199,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖboilerplateᚋdbᚐUserᚄ(ctx co
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖboilerplateᚋdbᚐUser(ctx context.Context, sel ast.SelectionSet, v *db.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖinfinoteᚋdbᚐUser(ctx context.Context, sel ast.SelectionSet, v *db.User) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5458,61 +5458,61 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalOCursorInput2boilerplateᚋgraphqlᚐCursorInput(ctx context.Context, v interface{}) (CursorInput, error) {
+func (ec *executionContext) unmarshalOCursorInput2infinoteᚋgraphqlᚐCursorInput(ctx context.Context, v interface{}) (CursorInput, error) {
 	return ec.unmarshalInputCursorInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOCursorInput2ᚖboilerplateᚋgraphqlᚐCursorInput(ctx context.Context, v interface{}) (*CursorInput, error) {
+func (ec *executionContext) unmarshalOCursorInput2ᚖinfinoteᚋgraphqlᚐCursorInput(ctx context.Context, v interface{}) (*CursorInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOCursorInput2boilerplateᚋgraphqlᚐCursorInput(ctx, v)
+	res, err := ec.unmarshalOCursorInput2infinoteᚋgraphqlᚐCursorInput(ctx, v)
 	return &res, err
 }
 
-func (ec *executionContext) marshalOCursorPlacement2boilerplateᚋgraphqlᚐCursorPlacement(ctx context.Context, sel ast.SelectionSet, v CursorPlacement) graphql.Marshaler {
+func (ec *executionContext) marshalOCursorPlacement2infinoteᚋgraphqlᚐCursorPlacement(ctx context.Context, sel ast.SelectionSet, v CursorPlacement) graphql.Marshaler {
 	return ec._CursorPlacement(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOCursorPlacement2ᚖboilerplateᚋgraphqlᚐCursorPlacement(ctx context.Context, sel ast.SelectionSet, v *CursorPlacement) graphql.Marshaler {
+func (ec *executionContext) marshalOCursorPlacement2ᚖinfinoteᚋgraphqlᚐCursorPlacement(ctx context.Context, sel ast.SelectionSet, v *CursorPlacement) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CursorPlacement(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOInsertNote2boilerplateᚋgraphqlᚐInsertNote(ctx context.Context, v interface{}) (InsertNote, error) {
+func (ec *executionContext) unmarshalOInsertNote2infinoteᚋgraphqlᚐInsertNote(ctx context.Context, v interface{}) (InsertNote, error) {
 	return ec.unmarshalInputInsertNote(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOInsertNote2ᚖboilerplateᚋgraphqlᚐInsertNote(ctx context.Context, v interface{}) (*InsertNote, error) {
+func (ec *executionContext) unmarshalOInsertNote2ᚖinfinoteᚋgraphqlᚐInsertNote(ctx context.Context, v interface{}) (*InsertNote, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOInsertNote2boilerplateᚋgraphqlᚐInsertNote(ctx, v)
+	res, err := ec.unmarshalOInsertNote2infinoteᚋgraphqlᚐInsertNote(ctx, v)
 	return &res, err
 }
 
-func (ec *executionContext) marshalONote2boilerplateᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v db.Note) graphql.Marshaler {
+func (ec *executionContext) marshalONote2infinoteᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v db.Note) graphql.Marshaler {
 	return ec._Note(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalONote2ᚖboilerplateᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v *db.Note) graphql.Marshaler {
+func (ec *executionContext) marshalONote2ᚖinfinoteᚋdbᚐNote(ctx context.Context, sel ast.SelectionSet, v *db.Note) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Note(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalORequestToken2boilerplateᚋgraphqlᚐRequestToken(ctx context.Context, v interface{}) (RequestToken, error) {
+func (ec *executionContext) unmarshalORequestToken2infinoteᚋgraphqlᚐRequestToken(ctx context.Context, v interface{}) (RequestToken, error) {
 	return ec.unmarshalInputRequestToken(ctx, v)
 }
 
-func (ec *executionContext) unmarshalORequestToken2ᚖboilerplateᚋgraphqlᚐRequestToken(ctx context.Context, v interface{}) (*RequestToken, error) {
+func (ec *executionContext) unmarshalORequestToken2ᚖinfinoteᚋgraphqlᚐRequestToken(ctx context.Context, v interface{}) (*RequestToken, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalORequestToken2boilerplateᚋgraphqlᚐRequestToken(ctx, v)
+	res, err := ec.unmarshalORequestToken2infinoteᚋgraphqlᚐRequestToken(ctx, v)
 	return &res, err
 }
 
@@ -5539,11 +5539,11 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return ec.marshalOString2string(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOTextInsert2boilerplateᚋgraphqlᚐTextInsert(ctx context.Context, sel ast.SelectionSet, v TextInsert) graphql.Marshaler {
+func (ec *executionContext) marshalOTextInsert2infinoteᚋgraphqlᚐTextInsert(ctx context.Context, sel ast.SelectionSet, v TextInsert) graphql.Marshaler {
 	return ec._TextInsert(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOTextInsert2ᚖboilerplateᚋgraphqlᚐTextInsert(ctx context.Context, sel ast.SelectionSet, v *TextInsert) graphql.Marshaler {
+func (ec *executionContext) marshalOTextInsert2ᚖinfinoteᚋgraphqlᚐTextInsert(ctx context.Context, sel ast.SelectionSet, v *TextInsert) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

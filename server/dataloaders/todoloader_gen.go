@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"boilerplate/db"
+	"infinote/db"
 )
 
 // NoteLoaderConfig captures the config to create a new NoteLoader

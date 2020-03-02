@@ -1,7 +1,7 @@
 package infinote
 
 import (
-	"boilerplate/store"
+	"infinote/store"
 	"context"
 	"fmt"
 	"sync"

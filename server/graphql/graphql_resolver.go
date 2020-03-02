@@ -1,9 +1,9 @@
 package graphql
 
 import (
-	infinote "boilerplate"
-	"boilerplate/canlog"
-	"boilerplate/db"
+	infinote "infinote"
+	"infinote/canlog"
+	"infinote/db"
 	"context"
 	"errors"
 	"fmt"
@@ -80,7 +80,7 @@ func (r *mutationResolver) RequestToken(ctx context.Context, input *RequestToken
 	}
 	//userID, err := uuid.FromString(u.ID)
 	//if err != nil {
-	//return "", boilerplate.ErrParse
+	//return "", infinote.ErrParse
 	//}
 	//role, err := r.RoleStorer.ByUser(userID)
 	//if err != nil {

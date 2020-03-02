@@ -1,10 +1,10 @@
 package infinote
 
 import (
-	"boilerplate/db"
-	"boilerplate/email"
-	"boilerplate/report"
-	"boilerplate/store"
+	"infinote/db"
+	"infinote/email"
+	"infinote/report"
+	"infinote/store"
 	"context"
 	"database/sql"
 

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"boilerplate/db"
+	"infinote/db"
 )
 
 // CompanyLoaderConfig captures the config to create a new CompanyLoader

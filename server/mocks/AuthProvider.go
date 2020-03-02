@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	db "boilerplate/db"
 	context "context"
+	db "infinote/db"
 
 	mock "github.com/stretchr/testify/mock"
 )

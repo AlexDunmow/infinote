@@ -1,10 +1,10 @@
 package seed
 
 import (
-	"boilerplate/crypto"
-	"boilerplate/db"
-	"boilerplate/graphql"
-	"boilerplate/store"
+	"infinote/crypto"
+	"infinote/db"
+	"infinote/graphql"
+	"infinote/store"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"

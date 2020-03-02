@@ -1,7 +1,7 @@
 package store
 
 import (
-	"boilerplate/db"
+	"infinote/db"
 	"database/sql"
 	"time"
 

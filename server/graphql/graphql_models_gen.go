@@ -3,8 +3,8 @@
 package graphql
 
 import (
-	"boilerplate/db"
 	"fmt"
+	"infinote/db"
 	"io"
 	"strconv"
 )

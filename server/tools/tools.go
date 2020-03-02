@@ -1,6 +1,6 @@
 // +build tools
 
-package boilerplate
+package infinote
 
 //go:generate go build -o ../../bin/mockery github.com/vektra/mockery/cmd/mockery
 //go:generate go build -o ../../bin/caddy github.com/caddyserver/caddy/caddy

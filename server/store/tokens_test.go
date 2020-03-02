@@ -1,7 +1,7 @@
 package store_test
 
 import (
-	"boilerplate/store"
+	"infinote/store"
 	"testing"
 
 	"github.com/gofrs/uuid"

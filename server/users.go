@@ -1,8 +1,8 @@
 package infinote
 
 import (
-	"boilerplate/canlog"
-	"boilerplate/db"
+	"infinote/canlog"
+	"infinote/db"
 	"context"
 	"fmt"
 

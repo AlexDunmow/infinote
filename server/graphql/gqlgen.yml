@@ -10,16 +10,16 @@ resolver:
 autobind: []
 models:
   Response:
-    model: boilerplate/graphql.Response
+    model: infinote/graphql.Response
   NullString:
-    model: boilerplate/graphql.NullString
+    model: infinote/graphql.NullString
   NullInt:
-    model: boilerplate/graphql.NullInt
+    model: infinote/graphql.NullInt
   OnboardingInput:
-    model: boilerplate/graphql.OnboardingInput
+    model: infinote/graphql.OnboardingInput
   User:
-    model: boilerplate/db.User
+    model: infinote/db.User
   Company:
-    model: boilerplate/db.Company
+    model: infinote/db.Company
   Note:
-    model: boilerplate/db.Note
+    model: infinote/db.Note

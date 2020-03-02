@@ -4,10 +4,10 @@ no-context = true
 no-tests = true
 
 [psql]
-  dbname = "boilerplate"
+  dbname = "infinote"
   host   = "localhost"
   port   = 5438
-  user   = "boilerplate"
+  user   = "infinote"
   pass   = "dev"
   schema = "public"
   blacklist = ["migrations", "other"]

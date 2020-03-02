@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	db "boilerplate/db"
+	db "infinote/db"
 	sql "database/sql"
 
 	mock "github.com/stretchr/testify/mock"

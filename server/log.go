@@ -1,7 +1,7 @@
 package infinote
 
 import (
-	"boilerplate/canlog"
+	"infinote/canlog"
 	"context"
 	"log/syslog"
 

@@ -25,11 +25,11 @@ type LoadBalancer struct {
 
 // Database for the Database service
 type Database struct {
-	User string `desc:"Postgres username" default:"boilerplate"`
+	User string `desc:"Postgres username" default:"infinote"`
 	Pass string `desc:"Postgres password" default:"dev"`
 	Host string `desc:"Postgres host" default:"localhost"`
 	Port string `desc:"Postgres port" default:"5438"`
-	Name string `desc:"Postgres database name" default:"boilerplate"`
+	Name string `desc:"Postgres database name" default:"infinote"`
 }
 
 // UserAuth holds variables for user auth config, such as token expiry
@@ -41,5 +41,5 @@ type UserAuth struct {
 
 // PrintConfigVars of the platform config struct
 func PrintConfigVars() error {
-	return envconfig.Usage("boilerplate", &PlatformConfig{})
+	return envconfig.Usage("infinote", &PlatformConfig{})
 }

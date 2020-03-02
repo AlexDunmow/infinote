@@ -1,10 +1,10 @@
 package infinote_test
 
 import (
-	infinote "boilerplate"
-	"boilerplate/db"
-	"boilerplate/mocks"
-	"boilerplate/store"
+	infinote "infinote"
+	"infinote/db"
+	"infinote/mocks"
+	"infinote/store"
 	"context"
 	"sync"
 	"testing"

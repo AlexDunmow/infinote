@@ -1,7 +1,7 @@
 package store_test
 
 import (
-	"boilerplate/bindata"
+	"infinote/bindata"
 	"fmt"
 	"log"
 	"testing"

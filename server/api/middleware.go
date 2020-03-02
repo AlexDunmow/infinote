@@ -1,8 +1,8 @@
 package api
 
 import (
-	infinote "boilerplate"
-	"boilerplate/canlog"
+	"infinote"
+	"infinote/canlog"
 	"context"
 	"fmt"
 	"net/http"
@@ -37,7 +37,7 @@ func NewPromMiddleware() func(next http.Handler) http.Handler {
 	var m PromMiddleware
 	m.reqs = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "boilerplate",
+			Namespace: "infinote",
 			Subsystem: "api",
 			Name:      reqsName,
 			Help:      "How many HTTP requests processed, partitioned by status code, method and HTTP path.",
@@ -47,7 +47,7 @@ func NewPromMiddleware() func(next http.Handler) http.Handler {
 	prometheus.MustRegister(m.reqs)
 
 	m.latency = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "boilerplate",
+		Namespace: "infinote",
 		Subsystem: "api",
 		Name:      latencyName,
 		Help:      "How long it took to process the request, partitioned by status code, method and HTTP path.",
@@ -77,7 +77,7 @@ func (m *PromMiddleware) handler(next http.Handler) http.Handler {
 func NewGQLMetrics() *GraphQLMetrics {
 	errorCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "boilerplate",
+			Namespace: "infinote",
 			Subsystem: "api",
 			Name:      "graphql_error_total",
 			Help:      "Total number of errors returned from the graphql server.",
@@ -87,7 +87,7 @@ func NewGQLMetrics() *GraphQLMetrics {
 
 	requestStartedCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "boilerplate",
+			Namespace: "infinote",
 			Subsystem: "api",
 			Name:      "graphql_request_started_total",
 			Help:      "Total number of requests started on the graphql server.",
@@ -97,7 +97,7 @@ func NewGQLMetrics() *GraphQLMetrics {
 
 	requestCompletedCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "boilerplate",
+			Namespace: "infinote",
 			Subsystem: "api",
 			Name:      "graphql_request_completed_total",
 			Help:      "Total number of requests completed on the graphql server.",
@@ -107,7 +107,7 @@ func NewGQLMetrics() *GraphQLMetrics {
 
 	resolverStartedCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "boilerplate",
+			Namespace: "infinote",
 			Subsystem: "api",
 			Name:      "graphql_resolver_started_total",
 			Help:      "Total number of resolver started on the graphql server.",
@@ -117,7 +117,7 @@ func NewGQLMetrics() *GraphQLMetrics {
 
 	resolverCompletedCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "boilerplate",
+			Namespace: "infinote",
 			Subsystem: "api",
 			Name:      "graphql_resolver_completed_total",
 			Help:      "Total number of resolver completed on the graphql server.",
@@ -126,14 +126,14 @@ func NewGQLMetrics() *GraphQLMetrics {
 	)
 
 	timeToResolveField := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "boilerplate",
+		Namespace: "infinote",
 		Subsystem: "api",
 		Name:      "graphql_resolver_duration_millseconds",
 		Help:      "The time taken to resolve a field by graphql server.",
 	}, []string{"object", "field"})
 
 	timeToHandleRequest := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "boilerplate",
+		Namespace: "infinote",
 		Subsystem: "api",
 		Name:      "graphql_request_duration_millseconds",
 		Help:      "The time taken to handle a request by graphql server.",

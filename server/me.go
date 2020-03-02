@@ -1,8 +1,8 @@
 package infinote
 
 import (
-	"boilerplate/crypto"
-	"boilerplate/db"
+	"infinote/crypto"
+	"infinote/db"
 	"context"
 	"errors"
 	"fmt"

@@ -1,9 +1,9 @@
 package graphql
 
 import (
-	infinote "boilerplate"
-	"boilerplate/canlog"
-	"boilerplate/db"
+	"infinote"
+	"infinote/canlog"
+	"infinote/db"
 	"context"
 	"errors"
 	"sync"

@@ -1,11 +1,11 @@
 package main
 
 import (
-	infinote "boilerplate"
-	"boilerplate/api"
-	"boilerplate/bindata"
-	"boilerplate/seed"
-	"boilerplate/store"
+	infinote "infinote"
+	"infinote/api"
+	"infinote/bindata"
+	"infinote/seed"
+	"infinote/store"
 	"log"
 
 	"github.com/kelseyhightower/envconfig"
@@ -42,7 +42,7 @@ const configCmd = "config"
 const serveCmd = "serve"
 
 func init() {
-	app = kingpin.New("boilerplate", "boilerplate hosting platform")
+	app = kingpin.New("infinote", "infinote hosting platform")
 	app.Version(version)
 	app.Command(serveCmd, "begin webserver").Default()
 	app.Command(dbVersionCmd, "step-up database")
@@ -56,7 +56,7 @@ func init() {
 func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	config := &infinote.PlatformConfig{}
-	err := envconfig.Process("boilerplate", config)
+	err := envconfig.Process("infinote", config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -199,7 +199,7 @@ func main() {
 			blacklistRefreshHours := config.UserAuth.BlacklistRefreshHours
 			blistProvider := infinote.NewBlacklister(logger, tokenStore, blacklistRefreshHours)
 
-			//			subResolver := boilerplate.NewSubHub()
+			//			subResolver := infinote.NewSubHub()
 
 			jwtSecret := config.UserAuth.JWTSecret
 			auther := infinote.NewAuther(jwtSecret, userStore, blistProvider, tokenStore, config.UserAuth.TokenExpiryDays)

@@ -1,4 +1,4 @@
-module boilerplate
+module infinote
 
 go 1.13
 

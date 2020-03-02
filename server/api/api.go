@@ -1,7 +1,7 @@
 package api
 
 import (
-	infinote "boilerplate"
+	"infinote"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -11,8 +11,8 @@ import (
 	gqlgraphql "github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
 
-	"boilerplate/canlog"
-	"boilerplate/graphql"
+	"infinote/canlog"
+	"infinote/graphql"
 	"context"
 	"fmt"
 	"net/http"
@@ -41,14 +41,14 @@ type ControllerOpts struct {
 	BlacklistProvider infinote.BlacklistProvider
 	TokenStorer       infinote.TokenStorer
 	RoleStorer        infinote.RoleStorer
-	//SubscriptionResolver boilerplate.SubscriptionProvider
+	//SubscriptionResolver infinote.SubscriptionProvider
 	JWTSecret string
 	Auther    *infinote.Auther
 	Logger    *zap.SugaredLogger
 }
 
-// log *zap.SugaredLogger, ts boilerplate.NoteStorer, os , us boilerplate.UserStorer,
-// bs boilerplate.BlacklistProvider, tks boilerplate.TokenStorer, rs boilerplate.RoleStorer, jwtSecret string, auther *boilerplate.Auther
+// log *zap.SugaredLogger, ts infinote.NoteStorer, os , us infinote.UserStorer,
+// bs infinote.BlacklistProvider, tks infinote.TokenStorer, rs infinote.RoleStorer, jwtSecret string, auther *infinote.Auther
 
 // NewAPIController returns the public router layer
 func NewAPIController(opts *ControllerOpts) http.Handler {

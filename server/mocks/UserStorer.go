@@ -3,10 +3,11 @@
 package mocks
 
 import (
-	db "boilerplate/db"
-	sql "database/sql"
+	db "infinote/db"
 
 	mock "github.com/stretchr/testify/mock"
+
+	sql "database/sql"
 
 	uuid "github.com/gofrs/uuid"
 )

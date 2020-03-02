@@ -1,8 +1,8 @@
 package infinote
 
 import (
-	"boilerplate/dataloaders"
-	"boilerplate/db"
+	"infinote/dataloaders"
+	"infinote/db"
 	"context"
 	"net/http"
 	"time"

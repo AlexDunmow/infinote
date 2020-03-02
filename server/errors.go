@@ -1,7 +1,7 @@
 package infinote
 
 import (
-	"boilerplate/db"
+	"infinote/db"
 	"context"
 	"errors"
 	"fmt"
