@@ -1,0 +1,13 @@
+# fix ulimit warning message from caddy
+
+link https://askubuntu.com/questions/1102512/set-ulimit-for-non-root-user
+
+/etc/systemd/user.conf
+  add  DefaultLimitNOFILE=65536
+
+/etc/systemd/system.conf
+  add  DefaultLimitNOFILE=65536
+
+/etc/security/limits.conf
+  add  * soft nofile 65536
+       * hard nofile 65536

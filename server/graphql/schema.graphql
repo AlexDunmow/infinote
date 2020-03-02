@@ -1,0 +1,137 @@
+directive @hasPerm(perm: Perm!) on FIELD_DEFINITION
+
+enum Perm {
+	NoteList
+	NoteCreate
+	NoteRead
+	NoteUpdate
+	NoteArchive
+	NoteUnarchive
+	UserList
+	UserCreate
+	UserRead
+	UserUpdate
+	UserArchive
+	UserUnarchive
+	CompanyList
+	CompanyCreate
+	CompanyRead
+	CompanyUpdate
+	CompanyArchive
+	CompanyUnarchive
+}
+
+type Note {
+	id: ID!
+	name: String!
+	body: String!
+	done: Boolean!
+	owner: User!
+}
+
+type User {
+	id: ID!
+	name: String!
+	email: String!
+	Company: Company!
+	verified: Boolean!
+	NotesConnection(limit: Int!, offset: Int!): NotesConnection!
+	# Convenience node when pagination isn't needed
+	Notes: [Note!]!
+}
+
+type NotesConnection {
+	totalCount: Int!
+	edges: [NotesEdge!]!
+	pageInfo: PageInfo!
+}
+type NotesEdge {
+	cursor: ID!
+	node: Note
+}
+type PageInfo {
+	startCursor: ID!
+	endCursor: ID!
+}
+type Company {
+	id: ID!
+	name: String!
+	users: [User!]!
+}
+
+type Query {
+	me: User!
+	Companys: [Company!]!
+	users: [User!]!
+	Notes: [Note!]!
+	noteByID(noteID: ID!): Note
+}
+
+type CursorPlacement {
+	lineNumber: Int!
+	column: Int!
+	userID: String!
+	userName: String!
+}
+
+type TextInsert {
+	text: String!
+	index: Int!
+}
+
+type NoteEvent {
+	noteID: String!
+	eventID: String!
+	insert: TextInsert
+	cursor: CursorPlacement
+	userID: String!
+	userName: String!
+}
+
+type NoteEventResult {
+	success: Boolean!
+}
+
+input CursorInput {
+	lineNumber: Int!
+	column: Int!
+}
+
+input UpdateNote {
+	id: ID!
+	text: String!
+}
+
+input CreateNote {
+	name: String!
+	body: String!
+}
+
+input RequestToken {
+	email: String!
+	password: String!
+}
+
+input InsertNote {
+	text: String!
+	index: Int!
+}
+
+input NoteChange {
+	eventID: String!
+	noteID: ID!
+	insert: InsertNote
+	cursor: CursorInput
+}
+
+
+type Mutation {
+	RequestToken(input: RequestToken): String!
+	NoteCreate(input: CreateNote!): Note!
+	NoteUpdate(input: UpdateNote!): Note!
+	NoteChange(input: NoteChange!): NoteEventResult!
+}
+
+type Subscription {
+	NoteEvent(noteID: String!): NoteEvent!
+}

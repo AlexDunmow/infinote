@@ -1,0 +1,13 @@
+[Unit]
+Description=Wholesolme
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/share/boilerplate/platform/config/
+ExecStart=/usr/share/boilerplate/platform/bin/server
+Restart=always
+
+[Install]
+WantedBy=multi-user.target%     

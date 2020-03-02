@@ -1,0 +1,25 @@
+schema:
+  - schema.graphql
+exec:
+  filename: ./graphql_schema_gen.go
+model:
+  filename: ./graphql_models_gen.go
+resolver:
+  filename: ./graphql_resolver.go
+  type: Resolver
+autobind: []
+models:
+  Response:
+    model: boilerplate/graphql.Response
+  NullString:
+    model: boilerplate/graphql.NullString
+  NullInt:
+    model: boilerplate/graphql.NullInt
+  OnboardingInput:
+    model: boilerplate/graphql.OnboardingInput
+  User:
+    model: boilerplate/db.User
+  Company:
+    model: boilerplate/db.Company
+  Note:
+    model: boilerplate/db.Note
