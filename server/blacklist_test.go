@@ -1,7 +1,7 @@
-package boilerplate_test
+package infinote_test
 
 import (
-	"boilerplate"
+	infinote "boilerplate"
 	"boilerplate/db"
 	"boilerplate/mocks"
 	"boilerplate/store"
@@ -19,11 +19,11 @@ func TestNewBlacklister(t *testing.T) {
 	l := zap.NewNop().Sugar()
 	tokenStore := &mocks.TokenStorer{}
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	type args struct {
 		log         *zap.SugaredLogger
 		tokenStorer *mocks.TokenStorer
-		authConfig  *boilerplate.UserAuth
+		authConfig  *infinote.UserAuth
 	}
 	tests := []struct {
 		name    string
@@ -34,7 +34,7 @@ func TestNewBlacklister(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.args.log, tt.args.tokenStorer, 24)
+			bl := infinote.NewBlacklister(tt.args.log, tt.args.tokenStorer, 24)
 			if !tt.wantNil && bl == nil {
 				t.Errorf("blacklister: got %v, expected not nil", bl)
 			}
@@ -46,7 +46,7 @@ func TestBlacklister_OnList(t *testing.T) {
 	l := zap.NewNop().Sugar()
 	tokenStore := &mocks.TokenStorer{}
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	blacklist := &mocks.BlacklistProvider{}
 	mutex := &sync.Mutex{}
 
@@ -55,7 +55,7 @@ func TestBlacklister_OnList(t *testing.T) {
 		mutex      *sync.Mutex
 		log        *zap.SugaredLogger
 		tokenStore *mocks.TokenStorer
-		authConfig *boilerplate.UserAuth
+		authConfig *infinote.UserAuth
 	}
 	type args struct {
 		tokenID string
@@ -70,7 +70,7 @@ func TestBlacklister_OnList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
+			bl := infinote.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
 			if got := bl.OnList(tt.args.tokenID); got != tt.want {
 				t.Errorf("Blacklister.OnList() = %v, want %v", got, tt.want)
 			}
@@ -83,7 +83,7 @@ func TestBlacklister_CleanIssuedTokens(t *testing.T) {
 	tokenStore := &mocks.TokenStorer{}
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
 	tokenStore.On("GetAllExpired").Return([]*db.IssuedToken{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	blacklist := &mocks.BlacklistProvider{}
 	mutex := &sync.Mutex{}
 
@@ -92,7 +92,7 @@ func TestBlacklister_CleanIssuedTokens(t *testing.T) {
 		mutex      *sync.Mutex
 		log        *zap.SugaredLogger
 		tokenStore *mocks.TokenStorer
-		authConfig *boilerplate.UserAuth
+		authConfig *infinote.UserAuth
 	}
 	type args struct {
 	}
@@ -106,7 +106,7 @@ func TestBlacklister_CleanIssuedTokens(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
+			bl := infinote.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
 			err := bl.CleanIssuedTokens()
 			if !tt.wantErr && err != nil {
 				t.Errorf("got %v, expected nil", err)
@@ -119,7 +119,7 @@ func TestBlacklister_RefreshBlacklist(t *testing.T) {
 	l := zap.NewNop().Sugar()
 	tokenStore := &mocks.TokenStorer{}
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	blacklist := &mocks.BlacklistProvider{}
 	mutex := &sync.Mutex{}
 
@@ -128,7 +128,7 @@ func TestBlacklister_RefreshBlacklist(t *testing.T) {
 		mutex      *sync.Mutex
 		log        *zap.SugaredLogger
 		tokenStore *mocks.TokenStorer
-		authConfig *boilerplate.UserAuth
+		authConfig *infinote.UserAuth
 	}
 	type args struct {
 		tokenID string
@@ -143,7 +143,7 @@ func TestBlacklister_RefreshBlacklist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
+			bl := infinote.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
 			err := bl.RefreshBlacklist()
 			if !tt.wantErr && err != nil {
 				t.Errorf("got %v, expected nil", err)
@@ -156,7 +156,7 @@ func TestBlacklister_StartTicker(t *testing.T) {
 	l := zap.NewNop().Sugar()
 	tokenStore := &mocks.TokenStorer{}
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	userAuth.BlacklistRefreshHours = 1
 	userAuth.TokenExpiryDays = 1
 	blacklist := &mocks.BlacklistProvider{}
@@ -167,7 +167,7 @@ func TestBlacklister_StartTicker(t *testing.T) {
 		mutex      *sync.Mutex
 		log        *zap.SugaredLogger
 		tokenStore *mocks.TokenStorer
-		authConfig *boilerplate.UserAuth
+		authConfig *infinote.UserAuth
 	}
 	type args struct {
 		tokenID string
@@ -182,7 +182,7 @@ func TestBlacklister_StartTicker(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
+			bl := infinote.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
 			ctx := context.Background()
 			ctx, cancel := context.WithTimeout(ctx, 1*time.Millisecond)
 			defer cancel()
@@ -196,7 +196,7 @@ func TestBlacklister_BlacklistAll(t *testing.T) {
 	tokenStore := &mocks.TokenStorer{}
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
 	tokenStore.On("GetAllByUser", mock.AnythingOfType("string")).Return([]*db.IssuedToken{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	blacklist := &mocks.BlacklistProvider{}
 	mutex := &sync.Mutex{}
 
@@ -205,7 +205,7 @@ func TestBlacklister_BlacklistAll(t *testing.T) {
 		mutex      *sync.Mutex
 		log        *zap.SugaredLogger
 		tokenStore *mocks.TokenStorer
-		authConfig *boilerplate.UserAuth
+		authConfig *infinote.UserAuth
 	}
 	type args struct {
 		tokenID string
@@ -220,7 +220,7 @@ func TestBlacklister_BlacklistAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
+			bl := infinote.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
 
 			err := bl.BlacklistAll(uuid.Must(uuid.NewV4()).String())
 			if !tt.wantErr && err != nil {
@@ -236,7 +236,7 @@ func TestBlacklister_BlacklistOne(t *testing.T) {
 	tokenStore.On("Blacklist").Return(store.Blacklist{}, nil)
 	tokenStore.On("Get", mock.AnythingOfType("string")).Return(&db.IssuedToken{}, nil)
 	tokenStore.On("Update", mock.AnythingOfType("*db.IssuedToken")).Return(&db.IssuedToken{}, nil)
-	userAuth := &boilerplate.UserAuth{}
+	userAuth := &infinote.UserAuth{}
 	blacklist := &mocks.BlacklistProvider{}
 	mutex := &sync.Mutex{}
 
@@ -245,7 +245,7 @@ func TestBlacklister_BlacklistOne(t *testing.T) {
 		mutex      *sync.Mutex
 		log        *zap.SugaredLogger
 		tokenStore *mocks.TokenStorer
-		authConfig *boilerplate.UserAuth
+		authConfig *infinote.UserAuth
 	}
 	type args struct {
 		tokenID string
@@ -260,7 +260,7 @@ func TestBlacklister_BlacklistOne(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bl := boilerplate.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
+			bl := infinote.NewBlacklister(tt.fields.log, tt.fields.tokenStore, 24)
 			err := bl.BlacklistOne(uuid.Must(uuid.NewV4()).String())
 			if !tt.wantErr && err != nil {
 				t.Errorf("got %v, expected nil", err)

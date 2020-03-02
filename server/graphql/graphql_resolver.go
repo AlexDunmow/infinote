@@ -1,7 +1,7 @@
 package graphql
 
 import (
-	"boilerplate"
+	infinote "boilerplate"
 	"boilerplate/canlog"
 	"boilerplate/db"
 	"context"
@@ -13,24 +13,24 @@ import (
 )
 
 type Resolver struct {
-	Auther               boilerplate.AuthProvider
-	NoteStorer           boilerplate.NoteStorer
-	RoleStorer           boilerplate.RoleStorer
-	CompanyStorer        boilerplate.CompanyStorer
-	UserStorer           boilerplate.UserStorer
-	BlacklistProvider    boilerplate.BlacklistProvider
+	Auther               infinote.AuthProvider
+	NoteStorer           infinote.NoteStorer
+	RoleStorer           infinote.RoleStorer
+	CompanyStorer        infinote.CompanyStorer
+	UserStorer           infinote.UserStorer
+	BlacklistProvider    infinote.BlacklistProvider
 	SubscriptionResolver subscriptionResolver
 	noterooms            map[string]*Noteroom
 	*sync.RWMutex
 }
 
 type ResolverOpts struct {
-	Auther               boilerplate.AuthProvider
-	NoteStorer           boilerplate.NoteStorer
-	RoleStorer           boilerplate.RoleStorer
-	CompanyStorer        boilerplate.CompanyStorer
-	UserStorer           boilerplate.UserStorer
-	BlacklistProvider    boilerplate.BlacklistProvider
+	Auther               infinote.AuthProvider
+	NoteStorer           infinote.NoteStorer
+	RoleStorer           infinote.RoleStorer
+	CompanyStorer        infinote.CompanyStorer
+	UserStorer           infinote.UserStorer
+	BlacklistProvider    infinote.BlacklistProvider
 	SubscriptionResolver subscriptionResolver
 }
 
@@ -70,13 +70,13 @@ type mutationResolver struct{ *Resolver }
 
 func (r *mutationResolver) RequestToken(ctx context.Context, input *RequestToken) (string, error) {
 	canlog.Set(ctx, "email", input.Email)
-	err := boilerplate.ValidatePassword(ctx, r.UserStorer, input.Email, input.Password)
+	err := infinote.ValidatePassword(ctx, r.UserStorer, input.Email, input.Password)
 	if err != nil {
-		return "", boilerplate.ErrBadCredentials
+		return "", infinote.ErrBadCredentials
 	}
 	u, err := r.UserStorer.GetByEmail(input.Email)
 	if err != nil {
-		return "", boilerplate.ErrBadCredentials
+		return "", infinote.ErrBadCredentials
 	}
 	//userID, err := uuid.FromString(u.ID)
 	//if err != nil {
@@ -88,7 +88,7 @@ func (r *mutationResolver) RequestToken(ctx context.Context, input *RequestToken
 	//}
 	token, err := r.Auther.GenerateJWT(ctx, u, "")
 	if err != nil {
-		return "", boilerplate.ErrBadCredentials
+		return "", infinote.ErrBadCredentials
 	}
 	return token, nil
 }
@@ -96,22 +96,22 @@ func (r *mutationResolver) RequestToken(ctx context.Context, input *RequestToken
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Me(ctx context.Context) (*db.User, error) {
-	u, err := boilerplate.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
+	u, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
 	if err != nil {
 		return nil, fmt.Errorf("user from context: %w", err)
 	}
 	return u, nil
 }
 func (r *queryResolver) Companys(ctx context.Context) ([]*db.Company, error) {
-	result, err := boilerplate.Companys(ctx, r.CompanyStorer)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.Companys(ctx, r.CompanyStorer)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil
 }
 func (r *queryResolver) Users(ctx context.Context) ([]*db.User, error) {
-	result, err := boilerplate.Users(ctx, r.UserStorer)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.Users(ctx, r.UserStorer)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil
@@ -125,8 +125,8 @@ func (r *organisationResolver) Users(ctx context.Context, obj *db.Company) ([]*d
 		return nil, err
 	}
 
-	result, err := boilerplate.UsersByCompanyID(ctx, orgID)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.UsersByCompanyID(ctx, orgID)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil
@@ -138,12 +138,12 @@ func (r *userResolver) NotesConnection(ctx context.Context, obj *db.User, limit 
 	userUUID, err := uuid.FromString(obj.ID)
 	if err != nil {
 		canlog.AppendErr(ctx, "74dd216c-220f-4247-8871-e82f5a80a8ec")
-		return nil, boilerplate.ErrParse
+		return nil, infinote.ErrParse
 	}
-	result, err := boilerplate.UserNotesSelect(ctx, r.NoteStorer, userUUID, limit, offset)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.UserNotesSelect(ctx, r.NoteStorer, userUUID, limit, offset)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		canlog.AppendErr(ctx, "79c6f9dc-56b3-4407-aeac-8bbd015087c4")
-		return nil, boilerplate.ErrUnauthorized
+		return nil, infinote.ErrUnauthorized
 	}
 	totalCount := len(result)
 	pageInfo := &PageInfo{
@@ -167,10 +167,10 @@ func (r *userResolver) NotesConnection(ctx context.Context, obj *db.User, limit 
 func (r *userResolver) Company(ctx context.Context, obj *db.User) (*db.Company, error) {
 	id, err := uuid.FromString(obj.CompanyID)
 	if err != nil {
-		return nil, boilerplate.ErrParse
+		return nil, infinote.ErrParse
 	}
-	result, err := boilerplate.Company(ctx, r.UserStorer, r.BlacklistProvider, id)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.Company(ctx, r.UserStorer, r.BlacklistProvider, id)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil
@@ -180,8 +180,8 @@ func (r *userResolver) Notes(ctx context.Context, obj *db.User) ([]*db.Note, err
 	if err != nil {
 		return nil, err
 	}
-	result, err := boilerplate.UserNotes(ctx, id)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.UserNotes(ctx, id)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil

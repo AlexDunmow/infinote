@@ -7,4 +7,4 @@
 //go:generate go run github.com/vektra/mockery/cmd/mockery -name BlacklistProvider
 //go:generate go run github.com/vektra/mockery/cmd/mockery -name AuthProvider
 
-package boilerplate
+package infinote

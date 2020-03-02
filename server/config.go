@@ -1,4 +1,4 @@
-package boilerplate
+package infinote
 
 import (
 	"github.com/kelseyhightower/envconfig"

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"boilerplate"
+	infinote "boilerplate"
 	"boilerplate/canlog"
 	"context"
 	"fmt"
@@ -220,23 +220,23 @@ func canonicalLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			now := time.Now()
-			ctx := boilerplate.WithCanonicalLogger(r.Context(), logger)
+			ctx := infinote.WithCanonicalLogger(r.Context(), logger)
 			canlog.Set(ctx, "start", now.Unix())
 			canlog.Set(ctx, "ip", r.RemoteAddr)
 			canlog.Set(ctx, "reqId", middleware.GetReqID(ctx))
 			next.ServeHTTP(w, r.WithContext(ctx))
 			canlog.Set(ctx, "duration_ms", fmt.Sprintf("%.02f", float64(time.Since(now).Microseconds())/1000))
 
-			if boilerplate.ClaimExistsInContext(ctx, boilerplate.ClaimUserName) {
-				username, _ := boilerplate.ClaimValueFromContext(ctx, boilerplate.ClaimUserName)
+			if infinote.ClaimExistsInContext(ctx, infinote.ClaimUserName) {
+				username, _ := infinote.ClaimValueFromContext(ctx, infinote.ClaimUserName)
 				canlog.Set(ctx, "username", username)
 			}
-			if boilerplate.ClaimExistsInContext(ctx, boilerplate.ClaimRoles) {
-				roles, _ := boilerplate.ClaimValueFromContext(ctx, boilerplate.ClaimRoles)
+			if infinote.ClaimExistsInContext(ctx, infinote.ClaimRoles) {
+				roles, _ := infinote.ClaimValueFromContext(ctx, infinote.ClaimRoles)
 				canlog.Set(ctx, "roles", roles)
 			}
-			if boilerplate.ClaimExistsInContext(ctx, boilerplate.ClaimUserID) {
-				userID, _ := boilerplate.ClaimValueFromContext(ctx, boilerplate.ClaimUserID)
+			if infinote.ClaimExistsInContext(ctx, infinote.ClaimUserID) {
+				userID, _ := infinote.ClaimValueFromContext(ctx, infinote.ClaimUserID)
 				canlog.Set(ctx, "user_id", userID)
 			}
 			canlog.Log(ctx, "request")

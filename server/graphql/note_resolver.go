@@ -1,7 +1,7 @@
 package graphql
 
 import (
-	"boilerplate"
+	infinote "boilerplate"
 	"boilerplate/canlog"
 	"boilerplate/db"
 	"context"
@@ -16,15 +16,15 @@ func insertIntoString(s, is string, index int) string {
 }
 
 func (r *queryResolver) Notes(ctx context.Context) ([]*db.Note, error) {
-	result, err := boilerplate.Notes(ctx, r.NoteStorer)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.Notes(ctx, r.NoteStorer)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil
 }
 func (r *queryResolver) NoteByID(ctx context.Context, noteID string) (*db.Note, error) {
 	if noteID == "" {
-		user, err := boilerplate.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
+		user, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
 		if err != nil {
 			return nil, err
 		}
@@ -33,21 +33,21 @@ func (r *queryResolver) NoteByID(ctx context.Context, noteID string) (*db.Note, 
 	noteUUID, err := uuid.FromString(noteID)
 	if err != nil {
 		canlog.AppendErr(ctx, "6d525675-3336-4f41-aa63-40889e63c96b")
-		return nil, boilerplate.ErrParse
+		return nil, infinote.ErrParse
 	}
 	note, err := r.NoteStorer.Get(noteUUID)
 	return note, nil
 }
 
 func (r *mutationResolver) NoteCreate(ctx context.Context, input CreateNote) (*db.Note, error) {
-	return boilerplate.NoteCreate(ctx, r.NoteStorer, input.Name, input.Body)
+	return infinote.NoteCreate(ctx, r.NoteStorer, input.Name, input.Body)
 }
 func (r *mutationResolver) NoteUpdate(ctx context.Context, input UpdateNote) (*db.Note, error) {
 	id, err := uuid.FromString(input.ID)
 	if err != nil {
-		return nil, boilerplate.ErrParse
+		return nil, infinote.ErrParse
 	}
-	return boilerplate.NoteUpdate(ctx, r.NoteStorer, id, input.Text)
+	return infinote.NoteUpdate(ctx, r.NoteStorer, id, input.Text)
 }
 
 type noteResolver struct{ *Resolver }
@@ -55,10 +55,10 @@ type noteResolver struct{ *Resolver }
 func (r *noteResolver) Owner(ctx context.Context, obj *db.Note) (*db.User, error) {
 	id, err := uuid.FromString(obj.OwnerID)
 	if err != nil {
-		return nil, boilerplate.ErrParse
+		return nil, infinote.ErrParse
 	}
-	result, err := boilerplate.User(ctx, id)
-	if errors.Is(err, boilerplate.ErrUnauthorized) {
+	result, err := infinote.User(ctx, id)
+	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
 	return result, nil
@@ -78,7 +78,7 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 		Success: false,
 	}
 
-	user, err := boilerplate.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
+	user, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
 	if err != nil {
 		return result, err
 	}
@@ -164,7 +164,7 @@ type subscriptionResolver struct{ *Resolver }
 func (r *subscriptionResolver) NoteEvent(ctx context.Context, noteID string) (<-chan *NoteEvent, error) {
 	var note *db.Note
 
-	user, err := boilerplate.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
+	user, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
 
 	uid, err := uuid.FromString(noteID)
 	if err != nil {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"boilerplate"
+	infinote "boilerplate"
 	"boilerplate/api"
 	"boilerplate/bindata"
 	"boilerplate/seed"
@@ -55,7 +55,7 @@ func init() {
 }
 func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
-	config := &boilerplate.PlatformConfig{}
+	config := &infinote.PlatformConfig{}
 	err := envconfig.Process("boilerplate", config)
 	if err != nil {
 		log.Fatal(err)
@@ -160,7 +160,7 @@ func main() {
 		return
 
 	case configCmd:
-		err = boilerplate.PrintConfigVars()
+		err = infinote.PrintConfigVars()
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -190,19 +190,19 @@ func main() {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		g.Add(func() error {
-			logger := boilerplate.NewLogToStdOut("api", version, false)
+			logger := infinote.NewLogToStdOut("api", version, false)
 			userStore := store.NewUserStore(conn)
 			companyStore := store.NewCompanyStore(conn)
 			notesStore := store.NewNoteStore(conn)
 			roleStorer := store.NewRoleStore(conn)
 			tokenStore := store.NewTokenStore(conn)
 			blacklistRefreshHours := config.UserAuth.BlacklistRefreshHours
-			blistProvider := boilerplate.NewBlacklister(logger, tokenStore, blacklistRefreshHours)
+			blistProvider := infinote.NewBlacklister(logger, tokenStore, blacklistRefreshHours)
 
 			//			subResolver := boilerplate.NewSubHub()
 
 			jwtSecret := config.UserAuth.JWTSecret
-			auther := boilerplate.NewAuther(jwtSecret, userStore, blistProvider, tokenStore, config.UserAuth.TokenExpiryDays)
+			auther := infinote.NewAuther(jwtSecret, userStore, blistProvider, tokenStore, config.UserAuth.TokenExpiryDays)
 			APIController := api.NewAPIController(&api.ControllerOpts{
 				NoteStorer:        notesStore,
 				UserStorer:        userStore,
@@ -216,7 +216,7 @@ func main() {
 				Logger:    logger,
 			})
 
-			server := &boilerplate.APIService{
+			server := &infinote.APIService{
 				Log:  logger,
 				Addr: config.API.Addr,
 			}
@@ -226,8 +226,8 @@ func main() {
 			cancel()
 		})
 		g.Add(func() error {
-			l := boilerplate.NewLogToStdOut("loadbalancer", version, false)
-			lb := boilerplate.LoadbalancerService{Addr: config.LoadBalancer.Addr, Log: l}
+			l := infinote.NewLogToStdOut("loadbalancer", version, false)
+			lb := infinote.LoadbalancerService{Addr: config.LoadBalancer.Addr, Log: l}
 			return lb.Run(ctx, config.LoadBalancer.Addr, config.API.Addr, config.LoadBalancer.RootPath)
 		}, func(error) {
 			fmt.Println(err)

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"boilerplate"
+	infinote "boilerplate"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -35,15 +35,15 @@ type BasicResponse struct {
 }
 
 type ControllerOpts struct {
-	NoteStorer        boilerplate.NoteStorer
-	UserStorer        boilerplate.UserStorer
-	CompanyStorer     boilerplate.CompanyStorer
-	BlacklistProvider boilerplate.BlacklistProvider
-	TokenStorer       boilerplate.TokenStorer
-	RoleStorer        boilerplate.RoleStorer
+	NoteStorer        infinote.NoteStorer
+	UserStorer        infinote.UserStorer
+	CompanyStorer     infinote.CompanyStorer
+	BlacklistProvider infinote.BlacklistProvider
+	TokenStorer       infinote.TokenStorer
+	RoleStorer        infinote.RoleStorer
 	//SubscriptionResolver boilerplate.SubscriptionProvider
 	JWTSecret string
-	Auther    *boilerplate.Auther
+	Auther    *infinote.Auther
 	Logger    *zap.SugaredLogger
 }
 
@@ -67,7 +67,7 @@ func NewAPIController(opts *ControllerOpts) http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(opts.Auther.VerifyMiddleware())
 	r.Use(canonicalLogger(opts.Logger.Desugar()))
-	r.Use(boilerplate.DataloaderMiddleware(opts.NoteStorer, opts.CompanyStorer, opts.UserStorer))
+	r.Use(infinote.DataloaderMiddleware(opts.NoteStorer, opts.CompanyStorer, opts.UserStorer))
 	r.Get("/metrics", promhttp.Handler().ServeHTTP)
 	r.Mount("/api/auth", authentication)
 	r.Route("/api/gql", func(r chi.Router) {
@@ -87,29 +87,29 @@ func NewAPIController(opts *ControllerOpts) http.Handler {
 			),
 			handler.ErrorPresenter(
 				func(ctx context.Context, e error) *gqlerror.Error {
-					var bErr *boilerplate.Error
+					var bErr *infinote.Error
 					canlog.SetErr(ctx, e)
 					if errors.As(e, &bErr) {
 						canlog.SetErr(ctx, errors.New(bErr.Error()))
 						canlog.AppendErr(ctx, bErr.ID)
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New(bErr.Message))
 					}
-					if errors.Is(e, boilerplate.ErrBadContext) {
+					if errors.Is(e, infinote.ErrBadContext) {
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("There was a problem reading your credentials. Please sign in and try again."))
 					}
-					if errors.Is(e, boilerplate.ErrBadClaims) {
+					if errors.Is(e, infinote.ErrBadClaims) {
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("There was a problem reading your credentials. Please sign in and try again."))
 					}
-					if errors.Is(e, boilerplate.ErrBlacklisted) {
+					if errors.Is(e, infinote.ErrBlacklisted) {
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("Login token is no longer valid. Please login again."))
 					}
-					if errors.Is(e, boilerplate.ErrUnauthorized) {
+					if errors.Is(e, infinote.ErrUnauthorized) {
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("You are not authorized to do this action."))
 					}
-					if errors.Is(e, boilerplate.ErrBadCredentials) {
+					if errors.Is(e, infinote.ErrBadCredentials) {
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("Please check your username or password and try again."))
 					}
-					if errors.Is(e, boilerplate.ErrNotImplemented) {
+					if errors.Is(e, infinote.ErrNotImplemented) {
 						return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("This functionality is not yet available."))
 					}
 					return gqlgraphql.DefaultErrorPresenter(ctx, errors.New("There was a problem with the server. Please try again later."))
@@ -128,9 +128,9 @@ func NewAPIController(opts *ControllerOpts) http.Handler {
 // AuthController contains handlers involving authentication
 type AuthController struct {
 	cookieDefaults CookieSettings
-	userStorer     boilerplate.UserStorer
-	roleStorer     boilerplate.RoleStorer
-	auther         *boilerplate.Auther
+	userStorer     infinote.UserStorer
+	roleStorer     infinote.RoleStorer
+	auther         *infinote.Auther
 }
 
 // CookieSettings are the default values used to set cookies
@@ -142,7 +142,7 @@ type CookieSettings struct {
 }
 
 // NewAuthRoutes returns a router for use in authentication
-func NewAuthRoutes(userStorer boilerplate.UserStorer, roleStorer boilerplate.RoleStorer, auther *boilerplate.Auther) chi.Router {
+func NewAuthRoutes(userStorer infinote.UserStorer, roleStorer infinote.RoleStorer, auther *infinote.Auther) chi.Router {
 	cookieDefaults := CookieSettings{
 		SameSite: http.SameSiteDefaultMode,
 		HTTPOnly: true,
@@ -181,7 +181,7 @@ func httpWriteError(w http.ResponseWriter, err error, message string, code int) 
 	ctx := context.Background()
 
 	// TODO, figure out log external
-	boilerplate.LogExternal(ctx, nil, err)
+	infinote.LogExternal(ctx, nil, err)
 
 	// message is the friendly error text
 	// do not send user internal error log
@@ -215,7 +215,7 @@ func (c *AuthController) login() func(w http.ResponseWriter, r *http.Request) {
 		// email must be lower case
 		email := strings.ToLower(req.Email)
 
-		err = boilerplate.ValidatePassword(ctx, c.userStorer, email, req.Password)
+		err = infinote.ValidatePassword(ctx, c.userStorer, email, req.Password)
 		if err != nil {
 			httpWriteError(w, err, "email or password fail", http.StatusUnauthorized)
 			return
