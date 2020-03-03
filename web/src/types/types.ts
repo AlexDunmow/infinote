@@ -58,11 +58,19 @@ export interface NoteInsert {
 	index: number
 }
 
+export interface ReplaceText {
+	text: string
+	index: number
+	end: number
+}
+
 export interface NoteEvent {
 	noteID: string
 	eventID: string
-	insert: NoteInsert
-	cursor: CursorPlacement
+	sessionID: string
+	insert?: NoteInsert
+	cursor?: CursorPlacement
+	replace?: ReplaceText
 	userID: string
 	userName: string
 }
@@ -70,6 +78,7 @@ export interface NoteEvent {
 export interface NoteChange {
 	noteID: string
 	eventID: string
+	sessionID: string
 	insert?: NoteInsert
 	cursor?: CursorPlacement
 }

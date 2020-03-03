@@ -78,12 +78,14 @@ type ComplexityRoot struct {
 	}
 
 	NoteEvent struct {
-		Cursor   func(childComplexity int) int
-		EventID  func(childComplexity int) int
-		Insert   func(childComplexity int) int
-		NoteID   func(childComplexity int) int
-		UserID   func(childComplexity int) int
-		UserName func(childComplexity int) int
+		Cursor    func(childComplexity int) int
+		EventID   func(childComplexity int) int
+		Insert    func(childComplexity int) int
+		NoteID    func(childComplexity int) int
+		Replace   func(childComplexity int) int
+		SessionID func(childComplexity int) int
+		UserID    func(childComplexity int) int
+		UserName  func(childComplexity int) int
 	}
 
 	NoteEventResult struct {
@@ -112,6 +114,12 @@ type ComplexityRoot struct {
 		NoteByID func(childComplexity int, noteID string) int
 		Notes    func(childComplexity int) int
 		Users    func(childComplexity int) int
+	}
+
+	ReplaceTextNote struct {
+		End   func(childComplexity int) int
+		Index func(childComplexity int) int
+		Text  func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -338,6 +346,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NoteEvent.NoteID(childComplexity), true
 
+	case "NoteEvent.replace":
+		if e.complexity.NoteEvent.Replace == nil {
+			break
+		}
+
+		return e.complexity.NoteEvent.Replace(childComplexity), true
+
+	case "NoteEvent.sessionID":
+		if e.complexity.NoteEvent.SessionID == nil {
+			break
+		}
+
+		return e.complexity.NoteEvent.SessionID(childComplexity), true
+
 	case "NoteEvent.userID":
 		if e.complexity.NoteEvent.UserID == nil {
 			break
@@ -447,6 +469,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Users(childComplexity), true
+
+	case "ReplaceTextNote.end":
+		if e.complexity.ReplaceTextNote.End == nil {
+			break
+		}
+
+		return e.complexity.ReplaceTextNote.End(childComplexity), true
+
+	case "ReplaceTextNote.index":
+		if e.complexity.ReplaceTextNote.Index == nil {
+			break
+		}
+
+		return e.complexity.ReplaceTextNote.Index(childComplexity), true
+
+	case "ReplaceTextNote.text":
+		if e.complexity.ReplaceTextNote.Text == nil {
+			break
+		}
+
+		return e.complexity.ReplaceTextNote.Text(childComplexity), true
 
 	case "Subscription.NoteEvent":
 		if e.complexity.Subscription.NoteEvent == nil {
@@ -700,12 +743,20 @@ type TextInsert {
 	index: Int!
 }
 
+type ReplaceTextNote {
+	text: String!
+	index: Int!
+	end: Int!
+}
+
 type NoteEvent {
 	noteID: String!
 	eventID: String!
 	insert: TextInsert
 	cursor: CursorPlacement
+	replace: ReplaceTextNote
 	userID: String!
+	sessionID: String!
 	userName: String!
 }
 
@@ -738,11 +789,19 @@ input InsertNote {
 	index: Int!
 }
 
+input TextRplaceInput {
+	index: Int!
+	text: String!
+	end: Int!
+}
+
 input NoteChange {
 	eventID: String!
 	noteID: ID!
+	sessionID: String!
 	insert: InsertNote
 	cursor: CursorInput
+	replace: TextRplaceInput
 }
 
 
@@ -1694,6 +1753,40 @@ func (ec *executionContext) _NoteEvent_cursor(ctx context.Context, field graphql
 	return ec.marshalOCursorPlacement2ᚖinfinoteᚋgraphqlᚐCursorPlacement(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _NoteEvent_replace(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "NoteEvent",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Replace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ReplaceTextNote)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOReplaceTextNote2ᚖinfinoteᚋgraphqlᚐReplaceTextNote(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NoteEvent_userID(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1714,6 +1807,43 @@ func (ec *executionContext) _NoteEvent_userID(ctx context.Context, field graphql
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NoteEvent_sessionID(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "NoteEvent",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SessionID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2323,6 +2453,117 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ReplaceTextNote_text(ctx context.Context, field graphql.CollectedField, obj *ReplaceTextNote) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ReplaceTextNote",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Text, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ReplaceTextNote_index(ctx context.Context, field graphql.CollectedField, obj *ReplaceTextNote) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ReplaceTextNote",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Index, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ReplaceTextNote_end(ctx context.Context, field graphql.CollectedField, obj *ReplaceTextNote) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ReplaceTextNote",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.End, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Subscription_NoteEvent(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
@@ -3959,6 +4200,12 @@ func (ec *executionContext) unmarshalInputNoteChange(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "sessionID":
+			var err error
+			it.SessionID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "insert":
 			var err error
 			it.Insert, err = ec.unmarshalOInsertNote2ᚖinfinoteᚋgraphqlᚐInsertNote(ctx, v)
@@ -3968,6 +4215,12 @@ func (ec *executionContext) unmarshalInputNoteChange(ctx context.Context, obj in
 		case "cursor":
 			var err error
 			it.Cursor, err = ec.unmarshalOCursorInput2ᚖinfinoteᚋgraphqlᚐCursorInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "replace":
+			var err error
+			it.Replace, err = ec.unmarshalOTextRplaceInput2ᚖinfinoteᚋgraphqlᚐTextRplaceInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3992,6 +4245,36 @@ func (ec *executionContext) unmarshalInputRequestToken(ctx context.Context, obj 
 		case "password":
 			var err error
 			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTextRplaceInput(ctx context.Context, obj interface{}) (TextRplaceInput, error) {
+	var it TextRplaceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "index":
+			var err error
+			it.Index, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "text":
+			var err error
+			it.Text, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "end":
+			var err error
+			it.End, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4248,8 +4531,15 @@ func (ec *executionContext) _NoteEvent(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._NoteEvent_insert(ctx, field, obj)
 		case "cursor":
 			out.Values[i] = ec._NoteEvent_cursor(ctx, field, obj)
+		case "replace":
+			out.Values[i] = ec._NoteEvent_replace(ctx, field, obj)
 		case "userID":
 			out.Values[i] = ec._NoteEvent_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "sessionID":
+			out.Values[i] = ec._NoteEvent_sessionID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4480,6 +4770,43 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var replaceTextNoteImplementors = []string{"ReplaceTextNote"}
+
+func (ec *executionContext) _ReplaceTextNote(ctx context.Context, sel ast.SelectionSet, obj *ReplaceTextNote) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, replaceTextNoteImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ReplaceTextNote")
+		case "text":
+			out.Values[i] = ec._ReplaceTextNote_text(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "index":
+			out.Values[i] = ec._ReplaceTextNote_index(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "end":
+			out.Values[i] = ec._ReplaceTextNote_end(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5504,6 +5831,17 @@ func (ec *executionContext) marshalONote2ᚖinfinoteᚋdbᚐNote(ctx context.Con
 	return ec._Note(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOReplaceTextNote2infinoteᚋgraphqlᚐReplaceTextNote(ctx context.Context, sel ast.SelectionSet, v ReplaceTextNote) graphql.Marshaler {
+	return ec._ReplaceTextNote(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOReplaceTextNote2ᚖinfinoteᚋgraphqlᚐReplaceTextNote(ctx context.Context, sel ast.SelectionSet, v *ReplaceTextNote) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ReplaceTextNote(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalORequestToken2infinoteᚋgraphqlᚐRequestToken(ctx context.Context, v interface{}) (RequestToken, error) {
 	return ec.unmarshalInputRequestToken(ctx, v)
 }
@@ -5548,6 +5886,18 @@ func (ec *executionContext) marshalOTextInsert2ᚖinfinoteᚋgraphqlᚐTextInser
 		return graphql.Null
 	}
 	return ec._TextInsert(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTextRplaceInput2infinoteᚋgraphqlᚐTextRplaceInput(ctx context.Context, v interface{}) (TextRplaceInput, error) {
+	return ec.unmarshalInputTextRplaceInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOTextRplaceInput2ᚖinfinoteᚋgraphqlᚐTextRplaceInput(ctx context.Context, v interface{}) (*TextRplaceInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOTextRplaceInput2infinoteᚋgraphqlᚐTextRplaceInput(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

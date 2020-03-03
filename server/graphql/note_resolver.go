@@ -1,11 +1,12 @@
 package graphql
 
 import (
+	"context"
+	"errors"
 	"infinote"
 	"infinote/canlog"
 	"infinote/db"
-	"context"
-	"errors"
+	"log"
 	"sync"
 
 	"github.com/gofrs/uuid"
@@ -30,6 +31,14 @@ func (r *queryResolver) NoteByID(ctx context.Context, noteID string) (*db.Note, 
 		}
 		return r.newNote(user.ID)
 	}
+
+	r.RLock()
+	defer r.RUnlock()
+	noteRoom, ok := r.noterooms[noteID]
+	if ok {
+		return noteRoom.Note, nil
+	}
+
 	noteUUID, err := uuid.FromString(noteID)
 	if err != nil {
 		canlog.AppendErr(ctx, "6d525675-3336-4f41-aa63-40889e63c96b")
@@ -86,16 +95,35 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 	noteID := input.NoteID
 	eventID := input.EventID
 
+	log.Println("SESSOIN ID", input.SessionID)
+
 	event := &NoteEvent{
-		NoteID:   noteID,
-		EventID:  eventID,
-		UserID:   user.ID,
-		UserName: user.Name,
+		NoteID:    noteID,
+		EventID:   eventID,
+		UserID:    user.ID,
+		UserName:  user.Name,
+		SessionID: input.SessionID,
 	}
 
 	r.RLock()
-	noteRoom := r.noterooms[noteID]
+	defer r.RUnlock()
+	noteRoom, ok := r.noterooms[noteID]
+	if !ok {
+		uid, err := uuid.FromString(noteID)
+		if err != nil {
+			return nil, err
+		}
+		note, err := r.NoteStorer.Get(uid)
+		if err != nil {
+			note, err = r.newNote(user.ID)
+		}
+		noteRoom, err = r.noteRoom(note)
+		if err != nil {
+			return nil, err
+		}
+	}
 	noteRoom.Lock()
+	defer noteRoom.Unlock()
 
 	if input.Insert != nil {
 		text := input.Insert.Text
@@ -104,6 +132,18 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 		event.Insert = &TextInsert{
 			Text:  text,
 			Index: index,
+		}
+	}
+
+	if input.Replace != nil {
+		text := input.Replace.Text
+		index := input.Replace.Index
+		end := input.Replace.End
+		noteRoom.Note.Body = insertIntoString(noteRoom.Note.Body, text, index)
+		event.Replace = &ReplaceTextNote{
+			Text:  text,
+			Index: index,
+			End:   end,
 		}
 	}
 
@@ -121,9 +161,6 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 
 	result.Success = true
 
-	noteRoom.Unlock()
-
-	r.RUnlock()
 	return result, nil
 }
 
@@ -193,8 +230,8 @@ func (r *subscriptionResolver) NoteEvent(ctx context.Context, noteID string) (<-
 	go func() {
 		<-ctx.Done()
 		r.Lock()
+		defer r.Unlock()
 		delete(room.Observers, idStr)
-		r.Unlock()
 	}()
 
 	r.Lock()

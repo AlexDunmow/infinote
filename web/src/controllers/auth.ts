@@ -30,17 +30,20 @@ const useAuth = () => {
 	const [loggedIn, setLoggedIn] = React.useState<boolean>(false)
 	const [logoutRedirect, setLogoutRedirect] = React.useState<boolean>(false)
 	const [isLoading, setLoading] = React.useState<boolean>(true)
+	const [isVerified, setVerified] = React.useState<boolean>(false)
 	const [showVerifyComplete, setShowVerifyComplete] = React.useState<boolean>(false)
 	const [user, setUser] = React.useState<User>()
-	const [checked, setChecked] = React.useState<boolean>(false)
+	const [check, setChecked] = React.useState<{ checking: boolean; checked: boolean }>({ checking: true, checked: false })
 
 	const { data, loading, error } = useQuery(USER_QUERY)
-	if (!checked && !loading) {
-		setChecked(true)
+
+	if (!check.checked && !loading) {
+		setChecked({ checked: true, checking: false })
 		setLoading(false)
-		if (data && data.me && data.me.verified) {
-			setLoggedIn(true)
+		if (data && data.me) {
+			setLoggedIn(data.me.verified)
 			setUser(data.me)
+			setVerified(data.me.verified)
 		} else {
 			setLoggedIn(false)
 			setUser(undefined)
@@ -119,7 +122,7 @@ const useAuth = () => {
 		clearAuthErrors,
 		loggedIn,
 		logoutRedirect,
-		checked,
+		check,
 		setLogoutRedirect,
 		showVerifyComplete,
 		user,

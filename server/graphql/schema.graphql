@@ -79,12 +79,20 @@ type TextInsert {
 	index: Int!
 }
 
+type ReplaceTextNote {
+	text: String!
+	index: Int!
+	end: Int!
+}
+
 type NoteEvent {
 	noteID: String!
 	eventID: String!
 	insert: TextInsert
 	cursor: CursorPlacement
+	replace: ReplaceTextNote
 	userID: String!
+	sessionID: String!
 	userName: String!
 }
 
@@ -117,11 +125,19 @@ input InsertNote {
 	index: Int!
 }
 
+input TextRplaceInput {
+	index: Int!
+	text: String!
+	end: Int!
+}
+
 input NoteChange {
 	eventID: String!
 	noteID: ID!
+	sessionID: String!
 	insert: InsertNote
 	cursor: CursorInput
+	replace: TextRplaceInput
 }
 
 

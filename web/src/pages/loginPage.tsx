@@ -10,7 +10,7 @@ import { Redirect } from "react-router"
 const LogoPath = require("../assets/images/logo.svg")
 
 const LoginPage = () => {
-	const { loading, checked, loggedIn } = AuthContainer.useContainer()
+	const { loading, check, loggedIn } = AuthContainer.useContainer()
 	if (loggedIn) {
 		return <Redirect to={"/"} />
 	}
@@ -43,8 +43,8 @@ const LoginPage = () => {
 	return (
 		<Container>
 			<FormContainer>
-				{!checked && <Loading />}
-				{checked && (
+				{!check.checked && <Loading />}
+				{check.checked && (
 					<Logo>
 						<img className={logoCss} src={LogoPath} />
 						<h1>Infinote</h1>

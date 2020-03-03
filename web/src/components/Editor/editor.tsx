@@ -9,13 +9,15 @@ import { editor } from "monaco-editor"
 import ICursorPositionChangedEvent = editor.ICursorPositionChangedEvent
 import ICodeEditor = editor.ICodeEditor
 import { useMutation, useSubscription } from "@apollo/react-hooks"
-import { CursorInput, Note, NoteChange, NoteEvent, NoteInsert } from "../types/types"
+import { CursorInput, Note, NoteChange, NoteEvent, NoteInsert } from "../../types/types"
+import Changes from "./changes"
 
 const SUB = gql`
 	subscription onNoteEvent($noteID: String!) {
 		NoteEvent(noteID: $noteID) {
 			noteID
 			eventID
+			sessionID
 			insert {
 				text
 				index
@@ -54,12 +56,16 @@ function randomID(): string {
 	)
 }
 
+const sessionID = randomID()
+
 const NoteEditor = ({ note }: Props) => {
 	const editorRef = useRef<monaco.editor.ICodeEditor>()
-	const [eventHistory, setHistory] = useState<{ [id: string]: boolean }>({})
+	const [history, setHistory] = useState<string[]>([])
+
+	const [contentManager, setContentManager] = useState<EditorContentManager>()
 
 	const [insertText, insData] = useMutation<{ NoteChange: boolean }, { input: NoteChange }>(NOTECHANGE)
-	const { data, loading } = useSubscription<NoteEvent>(SUB, { variables: { noteID: note.id } })
+	const { data, loading } = useSubscription<{ NoteEvent: NoteEvent }>(SUB, { variables: { noteID: note.id } })
 
 	function handleEditorDidMount(_: any, editor: ICodeEditor) {
 		editorRef.current = editor
@@ -82,13 +88,11 @@ const NoteEditor = ({ note }: Props) => {
 				console.log("Insert", index, text)
 				const eventID = randomID()
 
-				const newHistory = { ...eventHistory, eventID: false }
-				setHistory(newHistory)
-
 				insertText({
 					variables: {
 						input: {
 							noteID: note.id,
+							sessionID,
 							eventID,
 							insert: {
 								text,
@@ -102,12 +106,12 @@ const NoteEditor = ({ note }: Props) => {
 				console.log("Delete", index, length)
 			}
 		})
+
+		setContentManager(contentManager)
 		//
 		// const cursor = remoteCursorManager.addCursor("jDoe", "blue", "John Doe")
 		// cursor.setOffset(4)
 	}
-
-	console.log(data, loading, "subnscr")
 
 	function listenEditorChanges() {
 		if (editorRef.current) {
@@ -120,6 +124,7 @@ const NoteEditor = ({ note }: Props) => {
 	}
 	return (
 		<div>
+			{contentManager && <Changes contentManager={contentManager} event={data} setHistory={setHistory} history={history} sessionID={sessionID} />}
 			<Editor height={"20vh"} value={note.body} language="markdown" editorDidMount={handleEditorDidMount} theme={"vs-dark"} />
 		</div>
 	)

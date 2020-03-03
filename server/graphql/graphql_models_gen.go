@@ -32,19 +32,23 @@ type InsertNote struct {
 }
 
 type NoteChange struct {
-	EventID string       `json:"eventID"`
-	NoteID  string       `json:"noteID"`
-	Insert  *InsertNote  `json:"insert"`
-	Cursor  *CursorInput `json:"cursor"`
+	EventID   string           `json:"eventID"`
+	NoteID    string           `json:"noteID"`
+	SessionID string           `json:"sessionID"`
+	Insert    *InsertNote      `json:"insert"`
+	Cursor    *CursorInput     `json:"cursor"`
+	Replace   *TextRplaceInput `json:"replace"`
 }
 
 type NoteEvent struct {
-	NoteID   string           `json:"noteID"`
-	EventID  string           `json:"eventID"`
-	Insert   *TextInsert      `json:"insert"`
-	Cursor   *CursorPlacement `json:"cursor"`
-	UserID   string           `json:"userID"`
-	UserName string           `json:"userName"`
+	NoteID    string           `json:"noteID"`
+	EventID   string           `json:"eventID"`
+	Insert    *TextInsert      `json:"insert"`
+	Cursor    *CursorPlacement `json:"cursor"`
+	Replace   *ReplaceTextNote `json:"replace"`
+	UserID    string           `json:"userID"`
+	SessionID string           `json:"sessionID"`
+	UserName  string           `json:"userName"`
 }
 
 type NoteEventResult struct {
@@ -67,6 +71,12 @@ type PageInfo struct {
 	EndCursor   string `json:"endCursor"`
 }
 
+type ReplaceTextNote struct {
+	Text  string `json:"text"`
+	Index int    `json:"index"`
+	End   int    `json:"end"`
+}
+
 type RequestToken struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -75,6 +85,12 @@ type RequestToken struct {
 type TextInsert struct {
 	Text  string `json:"text"`
 	Index int    `json:"index"`
+}
+
+type TextRplaceInput struct {
+	Index int    `json:"index"`
+	Text  string `json:"text"`
+	End   int    `json:"end"`
 }
 
 type UpdateNote struct {

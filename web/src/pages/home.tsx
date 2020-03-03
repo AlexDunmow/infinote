@@ -9,7 +9,7 @@ import { useStyletron } from "baseui"
 import { AuthContainer } from "../controllers/auth"
 import { Loading } from "../components/loading"
 import Notes from "../components/notes"
-import NoteEditor from "../components/editor"
+import NoteEditor from "../components/Editor/editor"
 import { useQuery } from "@apollo/react-hooks"
 import { gql } from "apollo-boost"
 import { Note } from "../types/types"
@@ -40,7 +40,7 @@ export const Home = (props: IProps) => {
 	})
 
 	const [css, theme] = useStyletron()
-	const { loggedIn, checked } = AuthContainer.useContainer()
+	const auth = AuthContainer.useContainer()
 	const background = css({
 		minHeight: "100vh",
 		width: "100%",
@@ -60,10 +60,29 @@ export const Home = (props: IProps) => {
 		height: "100vh"
 	})
 
-	if (!checked || loading || !data) {
-		return <Loading />
+	if (loading || !data) {
+		console.log(
+			"auth.check.checked:",
+			auth.check.checked,
+			"auth.check.checking",
+			auth.check.checking,
+			"loading:",
+			loading,
+			"auth.loading:",
+			auth.loading,
+			"data:",
+			data
+		)
+		return (
+			<div>
+				Loading Note...
+				<Loading />
+			</div>
+		)
 	}
-	if (!loggedIn) {
+
+	if (!auth.loggedIn) {
+		console.log("not logged in", auth.check)
 		return <Redirect to={"/login"} />
 	}
 
