@@ -1,7 +1,7 @@
 import * as React from "react"
 import { RouteComponentProps, Redirect } from "react-router-dom"
 import { StyleObject } from "styletron-react"
-import { Button } from "baseui/button"
+import { Button, SHAPE } from "baseui/button"
 import { Spaced } from "../components/spaced"
 import { AnimatedLogin } from "../components/animatedLogin"
 import { useParams, useLocation, useHistory, useRouteMatch } from "react-router-dom"
@@ -12,37 +12,22 @@ import Notes from "../components/notes"
 import NoteEditor from "../components/Editor/editor"
 import { useQuery } from "@apollo/react-hooks"
 import { gql } from "apollo-boost"
-import { Note } from "../types/types"
-
+import { INote } from "../types/types"
+import { ButtonGroup } from "baseui/button-group"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { SIZE } from "baseui/input"
+import { faPlus } from "@fortawesome/pro-regular-svg-icons"
+import NewNoteButton from "../components/newNoteButton"
 interface IProps extends RouteComponentProps {}
 
 const Logo = require("../assets/images/Ninja-Software-Hero.png")
 
-const GETNOTE = gql`
-	query getNote($noteID: ID!) {
-		noteByID(noteID: $noteID) {
-			id
-			name
-			body
-			done
-			owner {
-				id
-			}
-		}
-	}
-`
-
 export const Home = (props: IProps) => {
-	const { noteID } = useParams<{ noteID: string }>()
-
-	const { loading, error, data } = useQuery<{ noteByID: Note }>(GETNOTE, {
-		variables: { noteID: noteID || "" }
-	})
-
 	const [css, theme] = useStyletron()
 	const auth = AuthContainer.useContainer()
 	const background = css({
 		minHeight: "100vh",
+		maxHeight: "100vh",
 		width: "100%",
 		backgroundImage: `url(${Logo})`,
 		backgroundRepeat: "repeat",
@@ -52,61 +37,50 @@ export const Home = (props: IProps) => {
 		alignItems: "center"
 	})
 
+	const controlCls = css({
+		height: "100px",
+		alignItems: "center",
+		justifyContent: "center",
+		display: "flex",
+		width: "100%"
+	})
+
+	const notesCls = css({
+		flex: 1,
+		display: "flex"
+	})
+
 	const container = css({
 		background: "white",
 		maxWidth: "1200px",
+		maxHeight: "100vh",
 		width: "100%",
 		margin: "0 auto",
-		height: "100vh"
+		height: "100vh",
+		display: "flex",
+		flexDirection: "column"
 	})
-
-	if (loading || !data) {
-		console.log(
-			"auth.check.checked:",
-			auth.check.checked,
-			"auth.check.checking",
-			auth.check.checking,
-			"loading:",
-			loading,
-			"auth.loading:",
-			auth.loading,
-			"data:",
-			data,
-			"error:",
-			error,
-			"logged in:",
-			auth.loggedIn
-		)
-
-		// auth.check.checked: true auth.check.checking false loading: true auth.loading: false data: {} error: undefined logged in: false
-		// home.tsx?d54c:64 auth.check.checked: true auth.check.checking false loading: true auth.loading: false data: {} error: undefined logged in: false
-
-		if (auth.check.checked && !auth.loggedIn) {
-			console.log("redirecting?")
-			const url = btoa(window.location.pathname)
-			return <Redirect to={`/login/${url}`} />
-		}
-
-		return (
-			<div>
-				Loading Note...
-				<Loading />
-			</div>
-		)
-	}
 
 	if (!auth.loggedIn) {
 		console.log("not logged in", auth.check)
 		return <Redirect to={"/login"} />
 	}
 
-	console.log("note: ", data)
-
 	return (
 		<div className={background}>
 			<div className={container}>
 				<Notes />
-				<NoteEditor note={data.noteByID} />
+				<div className={controlCls}>
+					<NewNoteButton>
+						<FontAwesomeIcon icon={"user-plus"} />
+					</NewNoteButton>
+					<NewNoteButton isLarge={true}>
+						<FontAwesomeIcon icon={"plus"} />
+					</NewNoteButton>
+					<NewNoteButton>
+						<FontAwesomeIcon icon={"user-plus"} />
+					</NewNoteButton>
+				</div>
 			</div>
 		</div>
 	)

@@ -59,19 +59,9 @@ type Company {
 	users: [User!]!
 }
 
-type Query {
-	me: User!
-	Companys: [Company!]!
-	users: [User!]!
-	Notes: [Note!]!
-	noteByID(noteID: ID!): Note
-}
-
 type CursorPlacement {
 	lineNumber: Int!
 	column: Int!
-	userID: String!
-	userName: String!
 }
 
 type TextInsert {
@@ -85,12 +75,18 @@ type ReplaceTextNote {
 	length: Int!
 }
 
+type DeleteTextNote {
+	index: Int!
+	length: Int!
+}
+
 type NoteEvent {
 	noteID: String!
 	eventID: String!
 	insert: TextInsert
 	cursor: CursorPlacement
 	replace: ReplaceTextNote
+	remove: DeleteTextNote
 	userID: String!
 	sessionID: String!
 	userName: String!
@@ -131,6 +127,11 @@ input TextRplaceInput {
 	length: Int!
 }
 
+input DeleteInput {
+	index: Int!
+	length: Int!
+}
+
 input NoteChange {
 	eventID: String!
 	noteID: ID!
@@ -138,6 +139,7 @@ input NoteChange {
 	insert: InsertNote
 	cursor: CursorInput
 	replace: TextRplaceInput
+	remove: DeleteInput
 }
 
 
@@ -148,6 +150,14 @@ type Mutation {
 	NoteChange(input: NoteChange!): NoteEventResult!
 }
 
+type Query {
+	me: User!
+	Companys: [Company!]!
+	users: [User!]!
+	notes: [Note!]!
+	noteByID(noteID: ID!): Note
+}
+
 type Subscription {
-	NoteEvent(noteID: String!): NoteEvent!
+	NoteEvent(noteID: String!, sessionID: String!): NoteEvent!
 }

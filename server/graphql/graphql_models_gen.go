@@ -20,10 +20,18 @@ type CursorInput struct {
 }
 
 type CursorPlacement struct {
-	LineNumber int    `json:"lineNumber"`
-	Column     int    `json:"column"`
-	UserID     string `json:"userID"`
-	UserName   string `json:"userName"`
+	LineNumber int `json:"lineNumber"`
+	Column     int `json:"column"`
+}
+
+type DeleteInput struct {
+	Index  int `json:"index"`
+	Length int `json:"length"`
+}
+
+type DeleteTextNote struct {
+	Index  int `json:"index"`
+	Length int `json:"length"`
 }
 
 type InsertNote struct {
@@ -38,6 +46,7 @@ type NoteChange struct {
 	Insert    *InsertNote      `json:"insert"`
 	Cursor    *CursorInput     `json:"cursor"`
 	Replace   *TextRplaceInput `json:"replace"`
+	Remove    *DeleteInput     `json:"remove"`
 }
 
 type NoteEvent struct {
@@ -46,6 +55,7 @@ type NoteEvent struct {
 	Insert    *TextInsert      `json:"insert"`
 	Cursor    *CursorPlacement `json:"cursor"`
 	Replace   *ReplaceTextNote `json:"replace"`
+	Remove    *DeleteTextNote  `json:"remove"`
 	UserID    string           `json:"userID"`
 	SessionID string           `json:"sessionID"`
 	UserName  string           `json:"userName"`

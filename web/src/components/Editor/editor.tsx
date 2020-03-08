@@ -9,12 +9,12 @@ import { editor } from "monaco-editor"
 import ICursorPositionChangedEvent = editor.ICursorPositionChangedEvent
 import ICodeEditor = editor.ICodeEditor
 import { useMutation, useSubscription } from "@apollo/react-hooks"
-import { CursorInput, Note, NoteChange, NoteEvent, NoteInsert } from "../../types/types"
+import { CursorInput, INote, NoteChange, NoteEvent, NoteInsert } from "../../types/types"
 import Changes from "./changes"
 
 const SUB = gql`
-	subscription onNoteEvent($noteID: String!) {
-		NoteEvent(noteID: $noteID) {
+	subscription onNoteEvent($noteID: String!, $sessionID: String!) {
+		NoteEvent(noteID: $noteID, sessionID: $sessionID) {
 			noteID
 			eventID
 			sessionID
@@ -31,6 +31,10 @@ const SUB = gql`
 				index
 				text
 			}
+			remove {
+				length
+				index
+			}
 			userID
 			userName
 		}
@@ -46,7 +50,7 @@ const NOTECHANGE = gql`
 `
 
 interface Props {
-	note: Note
+	note: INote
 }
 
 function randomID(): string {
@@ -68,9 +72,10 @@ const NoteEditor = ({ note }: Props) => {
 	const [history, setHistory] = useState<string[]>([])
 
 	const [contentManager, setContentManager] = useState<EditorContentManager>()
+	const [cursorManager, setCursorManager] = useState<RemoteCursorManager>()
 
 	const [changeNote, insData] = useMutation<{ NoteChange: boolean }, { input: NoteChange }>(NOTECHANGE)
-	const { data, loading } = useSubscription<{ NoteEvent: NoteEvent }>(SUB, { variables: { noteID: note.id } })
+	const { data, loading } = useSubscription<{ NoteEvent: NoteEvent }>(SUB, { variables: { noteID: note.id, sessionID } })
 
 	function handleEditorDidMount(_: any, editor: ICodeEditor) {
 		editorRef.current = editor
@@ -81,10 +86,21 @@ const NoteEditor = ({ note }: Props) => {
 		// })
 
 		editor.onDidChangeCursorPosition((e: ICursorPositionChangedEvent) => {
-			console.log(e)
+			console.log("Position change", e)
+			const eventID = randomID()
+			changeNote({
+				variables: {
+					input: {
+						noteID: note.id,
+						sessionID,
+						eventID,
+						cursor: e.position
+					}
+				}
+			})
 		})
 
-		const contentManager = new EditorContentManager({
+		const cManager = new EditorContentManager({
 			editor: editor as any,
 			onReplace(index, length, text) {
 				console.log("Replace", index, length, text)
@@ -124,10 +140,31 @@ const NoteEditor = ({ note }: Props) => {
 			},
 			onDelete(index, length) {
 				console.log("Delete", index, length)
+				const eventID = randomID()
+				changeNote({
+					variables: {
+						input: {
+							noteID: note.id,
+							sessionID,
+							eventID,
+							remove: {
+								length,
+								index
+							}
+						}
+					}
+				})
 			}
 		})
 
-		setContentManager(contentManager)
+		const cursManager = new RemoteCursorManager({
+			editor: editor as any,
+			tooltips: true,
+			tooltipDuration: 2
+		})
+
+		setCursorManager(cursManager)
+		setContentManager(cManager)
 		//
 		// const cursor = remoteCursorManager.addCursor("jDoe", "blue", "John Doe")
 		// cursor.setOffset(4)
@@ -144,7 +181,9 @@ const NoteEditor = ({ note }: Props) => {
 	}
 	return (
 		<div>
-			{contentManager && <Changes contentManager={contentManager} event={data} setHistory={setHistory} history={history} sessionID={sessionID} />}
+			{contentManager && cursorManager && (
+				<Changes cursorManager={cursorManager} contentManager={contentManager} event={data} setHistory={setHistory} history={history} sessionID={sessionID} />
+			)}
 			<Editor height={"20vh"} value={note.body} language="markdown" editorDidMount={handleEditorDidMount} theme={"vs-dark"} />
 		</div>
 	)

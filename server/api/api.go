@@ -1,9 +1,9 @@
 package api
 
 import (
-	"infinote"
 	"encoding/json"
 	"errors"
+	"infinote"
 	"strings"
 
 	"go.uber.org/zap"
@@ -11,10 +11,10 @@ import (
 	gqlgraphql "github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/handler"
 
-	"infinote/canlog"
-	"infinote/graphql"
 	"context"
 	"fmt"
+	"infinote/canlog"
+	"infinote/graphql"
 	"net/http"
 	"time"
 
@@ -170,6 +170,12 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+// LoginRequest structs for the HTTP request/response cycle
+type VerifyRequest struct {
+	Token string `json:"token"`
+	Email string `json:"email"`
+}
+
 // LoginResponse structs for the HTTP request/response cycle
 type LoginResponse struct {
 	Verified bool `json:"verified"`
@@ -284,7 +290,41 @@ func (c *AuthController) logout() func(w http.ResponseWriter, r *http.Request) {
 // verifyAccount verifies an account and logs the user in
 func (c *AuthController) verifyAccount() func(w http.ResponseWriter, r *http.Request) {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		req := &VerifyRequest{}
+		err := json.NewDecoder(r.Body).Decode(req)
+		if err != nil {
+			httpWriteError(w, err, "invalid user input", http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
 
+		// email and token must be lower case
+		email := strings.ToLower(req.Email)
+		token := strings.ToLower(req.Token)
+
+		// load user details
+		user, err := c.userStorer.GetByEmail(email)
+		if err != nil {
+			httpWriteError(w, err, "fail to load user", http.StatusInternalServerError)
+			return
+		}
+
+		if user.VerifyToken != token {
+			httpWriteError(w, err, "fail to validate token", http.StatusInternalServerError)
+			return
+		}
+
+		user.Verified = true
+		user, err = c.userStorer.Update(user)
+		if err != nil {
+			panic(err)
+		}
+
+		resp := &BasicResponse{
+			Success: true,
+		}
+
+		httpWriteJSON(w, resp)
 	}
 	return fn
 }

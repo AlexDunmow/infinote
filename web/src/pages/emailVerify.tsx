@@ -12,53 +12,49 @@ import { Redirect } from "react-router"
 
 interface IProps {
 	code?: string
+	redirect?: string
 }
 
 export const EmailVerify = (props: IProps) => {
+	console.log("EMAIL VERIFY")
+
 	const { code } = props
 
-	const [css, theme] = useStyletron()
-	const cardContainer: string = css({
-		height: "100vh",
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center",
-	})
-
-	const { userErrors, loading, loggedIn, verify } = AuthContainer.useContainer()
+	const { userErrors, loading, user, verify } = AuthContainer.useContainer()
 
 	const [verifyCode, setVerifyCode] = React.useState<string>(code ? code : "")
 	const [inputError, setInputError] = React.useState<string>("")
 
-	const handleClick = () => {
-		// Note: validation?
-		verify(verifyCode)
+	if (user && user.verified) {
+		return <Redirect to={"/"} />
 	}
 
-	if (loggedIn) {
-		return <Redirect to={"/portal"} />
+	const handleClick = () => {
+		// Note: validation?
+		if (!user) {
+			return
+		}
+		verify(verifyCode, user.email)
 	}
 
 	return (
-		<div className={cardContainer}>
-			<Card overrides={{ Root: { style: { flexGrow: 0.3 } } }}>
-				<div>
-					<ErrorBox userErrors={userErrors} />
-					<FormControl label="Verification Code" error={inputError}>
-						<Input
-							error={!!inputError}
-							positive={false}
-							value={verifyCode}
-							onChange={e => setVerifyCode(e.currentTarget.value)}
-							placeholder={"Enter your verification code"}
-						/>
-					</FormControl>
-					<Spaced>
-						<Button onClick={handleClick}>Verify</Button>
-						{loading && <Spinner />}
-					</Spaced>
-				</div>
-			</Card>
-		</div>
+		<Card>
+			<div>
+				<ErrorBox userErrors={userErrors} />
+				<FormControl label="Verification Code" error={inputError}>
+					<Input
+						error={!!inputError}
+						positive={false}
+						value={verifyCode}
+						onChange={e => setVerifyCode(e.currentTarget.value)}
+						placeholder={"Enter your verification code"}
+					/>
+				</FormControl>
+				<Spaced>
+					<Button onClick={handleClick}>Verify</Button>
+					{loading && <Spinner />}
+				</Spaced>
+			</div>
+		</Card>
 	)
 }

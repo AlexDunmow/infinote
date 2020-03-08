@@ -58,8 +58,11 @@ type ComplexityRoot struct {
 	CursorPlacement struct {
 		Column     func(childComplexity int) int
 		LineNumber func(childComplexity int) int
-		UserID     func(childComplexity int) int
-		UserName   func(childComplexity int) int
+	}
+
+	DeleteTextNote struct {
+		Index  func(childComplexity int) int
+		Length func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -82,6 +85,7 @@ type ComplexityRoot struct {
 		EventID   func(childComplexity int) int
 		Insert    func(childComplexity int) int
 		NoteID    func(childComplexity int) int
+		Remove    func(childComplexity int) int
 		Replace   func(childComplexity int) int
 		SessionID func(childComplexity int) int
 		UserID    func(childComplexity int) int
@@ -123,7 +127,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		NoteEvent func(childComplexity int, noteID string) int
+		NoteEvent func(childComplexity int, noteID string, sessionID string) int
 	}
 
 	TextInsert struct {
@@ -162,7 +166,7 @@ type QueryResolver interface {
 	NoteByID(ctx context.Context, noteID string) (*db.Note, error)
 }
 type SubscriptionResolver interface {
-	NoteEvent(ctx context.Context, noteID string) (<-chan *NoteEvent, error)
+	NoteEvent(ctx context.Context, noteID string, sessionID string) (<-chan *NoteEvent, error)
 }
 type UserResolver interface {
 	Company(ctx context.Context, obj *db.User) (*db.Company, error)
@@ -221,19 +225,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CursorPlacement.LineNumber(childComplexity), true
 
-	case "CursorPlacement.userID":
-		if e.complexity.CursorPlacement.UserID == nil {
+	case "DeleteTextNote.index":
+		if e.complexity.DeleteTextNote.Index == nil {
 			break
 		}
 
-		return e.complexity.CursorPlacement.UserID(childComplexity), true
+		return e.complexity.DeleteTextNote.Index(childComplexity), true
 
-	case "CursorPlacement.userName":
-		if e.complexity.CursorPlacement.UserName == nil {
+	case "DeleteTextNote.length":
+		if e.complexity.DeleteTextNote.Length == nil {
 			break
 		}
 
-		return e.complexity.CursorPlacement.UserName(childComplexity), true
+		return e.complexity.DeleteTextNote.Length(childComplexity), true
 
 	case "Mutation.NoteChange":
 		if e.complexity.Mutation.NoteChange == nil {
@@ -346,6 +350,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NoteEvent.NoteID(childComplexity), true
 
+	case "NoteEvent.remove":
+		if e.complexity.NoteEvent.Remove == nil {
+			break
+		}
+
+		return e.complexity.NoteEvent.Remove(childComplexity), true
+
 	case "NoteEvent.replace":
 		if e.complexity.NoteEvent.Replace == nil {
 			break
@@ -456,7 +467,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.NoteByID(childComplexity, args["noteID"].(string)), true
 
-	case "Query.Notes":
+	case "Query.notes":
 		if e.complexity.Query.Notes == nil {
 			break
 		}
@@ -501,7 +512,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Subscription.NoteEvent(childComplexity, args["noteID"].(string)), true
+		return e.complexity.Subscription.NoteEvent(childComplexity, args["noteID"].(string), args["sessionID"].(string)), true
 
 	case "TextInsert.index":
 		if e.complexity.TextInsert.Index == nil {
@@ -723,19 +734,9 @@ type Company {
 	users: [User!]!
 }
 
-type Query {
-	me: User!
-	Companys: [Company!]!
-	users: [User!]!
-	Notes: [Note!]!
-	noteByID(noteID: ID!): Note
-}
-
 type CursorPlacement {
 	lineNumber: Int!
 	column: Int!
-	userID: String!
-	userName: String!
 }
 
 type TextInsert {
@@ -749,12 +750,18 @@ type ReplaceTextNote {
 	length: Int!
 }
 
+type DeleteTextNote {
+	index: Int!
+	length: Int!
+}
+
 type NoteEvent {
 	noteID: String!
 	eventID: String!
 	insert: TextInsert
 	cursor: CursorPlacement
 	replace: ReplaceTextNote
+	remove: DeleteTextNote
 	userID: String!
 	sessionID: String!
 	userName: String!
@@ -795,6 +802,11 @@ input TextRplaceInput {
 	length: Int!
 }
 
+input DeleteInput {
+	index: Int!
+	length: Int!
+}
+
 input NoteChange {
 	eventID: String!
 	noteID: ID!
@@ -802,6 +814,7 @@ input NoteChange {
 	insert: InsertNote
 	cursor: CursorInput
 	replace: TextRplaceInput
+	remove: DeleteInput
 }
 
 
@@ -812,8 +825,16 @@ type Mutation {
 	NoteChange(input: NoteChange!): NoteEventResult!
 }
 
+type Query {
+	me: User!
+	Companys: [Company!]!
+	users: [User!]!
+	notes: [Note!]!
+	noteByID(noteID: ID!): Note
+}
+
 type Subscription {
-	NoteEvent(noteID: String!): NoteEvent!
+	NoteEvent(noteID: String!, sessionID: String!): NoteEvent!
 }`},
 )
 
@@ -930,6 +951,14 @@ func (ec *executionContext) field_Subscription_NoteEvent_args(ctx context.Contex
 		}
 	}
 	args["noteID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["sessionID"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sessionID"] = arg1
 	return args, nil
 }
 
@@ -1176,7 +1205,7 @@ func (ec *executionContext) _CursorPlacement_column(ctx context.Context, field g
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CursorPlacement_userID(ctx context.Context, field graphql.CollectedField, obj *CursorPlacement) (ret graphql.Marshaler) {
+func (ec *executionContext) _DeleteTextNote_index(ctx context.Context, field graphql.CollectedField, obj *DeleteTextNote) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1186,7 +1215,7 @@ func (ec *executionContext) _CursorPlacement_userID(ctx context.Context, field g
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "CursorPlacement",
+		Object:   "DeleteTextNote",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -1195,7 +1224,7 @@ func (ec *executionContext) _CursorPlacement_userID(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
+		return obj.Index, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1207,13 +1236,13 @@ func (ec *executionContext) _CursorPlacement_userID(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CursorPlacement_userName(ctx context.Context, field graphql.CollectedField, obj *CursorPlacement) (ret graphql.Marshaler) {
+func (ec *executionContext) _DeleteTextNote_length(ctx context.Context, field graphql.CollectedField, obj *DeleteTextNote) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1223,7 +1252,7 @@ func (ec *executionContext) _CursorPlacement_userName(ctx context.Context, field
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "CursorPlacement",
+		Object:   "DeleteTextNote",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -1232,7 +1261,7 @@ func (ec *executionContext) _CursorPlacement_userName(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserName, nil
+		return obj.Length, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1244,10 +1273,10 @@ func (ec *executionContext) _CursorPlacement_userName(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_RequestToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1787,6 +1816,40 @@ func (ec *executionContext) _NoteEvent_replace(ctx context.Context, field graphq
 	return ec.marshalOReplaceTextNote2ᚖinfinoteᚋgraphqlᚐReplaceTextNote(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _NoteEvent_remove(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "NoteEvent",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Remove, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*DeleteTextNote)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalODeleteTextNote2ᚖinfinoteᚋgraphqlᚐDeleteTextNote(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NoteEvent_userID(ctx context.Context, field graphql.CollectedField, obj *NoteEvent) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -2302,7 +2365,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	return ec.marshalNUser2ᚕᚖinfinoteᚋdbᚐUserᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_Notes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_notes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2592,7 +2655,7 @@ func (ec *executionContext) _Subscription_NoteEvent(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().NoteEvent(rctx, args["noteID"].(string))
+		return ec.resolvers.Subscription().NoteEvent(rctx, args["noteID"].(string), args["sessionID"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4158,6 +4221,30 @@ func (ec *executionContext) unmarshalInputCursorInput(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteInput(ctx context.Context, obj interface{}) (DeleteInput, error) {
+	var it DeleteInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "index":
+			var err error
+			it.Index, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "length":
+			var err error
+			it.Length, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInsertNote(ctx context.Context, obj interface{}) (InsertNote, error) {
 	var it InsertNote
 	var asMap = obj.(map[string]interface{})
@@ -4221,6 +4308,12 @@ func (ec *executionContext) unmarshalInputNoteChange(ctx context.Context, obj in
 		case "replace":
 			var err error
 			it.Replace, err = ec.unmarshalOTextRplaceInput2ᚖinfinoteᚋgraphqlᚐTextRplaceInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remove":
+			var err error
+			it.Remove, err = ec.unmarshalODeleteInput2ᚖinfinoteᚋgraphqlᚐDeleteInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4383,13 +4476,35 @@ func (ec *executionContext) _CursorPlacement(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userID":
-			out.Values[i] = ec._CursorPlacement_userID(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteTextNoteImplementors = []string{"DeleteTextNote"}
+
+func (ec *executionContext) _DeleteTextNote(ctx context.Context, sel ast.SelectionSet, obj *DeleteTextNote) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, deleteTextNoteImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteTextNote")
+		case "index":
+			out.Values[i] = ec._DeleteTextNote_index(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "userName":
-			out.Values[i] = ec._CursorPlacement_userName(ctx, field, obj)
+		case "length":
+			out.Values[i] = ec._DeleteTextNote_length(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4533,6 +4648,8 @@ func (ec *executionContext) _NoteEvent(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._NoteEvent_cursor(ctx, field, obj)
 		case "replace":
 			out.Values[i] = ec._NoteEvent_replace(ctx, field, obj)
+		case "remove":
+			out.Values[i] = ec._NoteEvent_remove(ctx, field, obj)
 		case "userID":
 			out.Values[i] = ec._NoteEvent_userID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4741,7 +4858,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "Notes":
+		case "notes":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -4749,7 +4866,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_Notes(ctx, field)
+				res = ec._Query_notes(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5806,6 +5923,29 @@ func (ec *executionContext) marshalOCursorPlacement2ᚖinfinoteᚋgraphqlᚐCurs
 		return graphql.Null
 	}
 	return ec._CursorPlacement(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalODeleteInput2infinoteᚋgraphqlᚐDeleteInput(ctx context.Context, v interface{}) (DeleteInput, error) {
+	return ec.unmarshalInputDeleteInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalODeleteInput2ᚖinfinoteᚋgraphqlᚐDeleteInput(ctx context.Context, v interface{}) (*DeleteInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalODeleteInput2infinoteᚋgraphqlᚐDeleteInput(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalODeleteTextNote2infinoteᚋgraphqlᚐDeleteTextNote(ctx context.Context, sel ast.SelectionSet, v DeleteTextNote) graphql.Marshaler {
+	return ec._DeleteTextNote(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalODeleteTextNote2ᚖinfinoteᚋgraphqlᚐDeleteTextNote(ctx context.Context, sel ast.SelectionSet, v *DeleteTextNote) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteTextNote(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOInsertNote2infinoteᚋgraphqlᚐInsertNote(ctx context.Context, v interface{}) (InsertNote, error) {

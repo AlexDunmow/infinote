@@ -4,9 +4,9 @@ import { useStyletron } from "baseui"
 import { Home } from "./home"
 import LoginPage from "./loginPage"
 import { AuthContainer } from "../controllers/auth"
-import { useQuery } from "@apollo/react-hooks"
-import { USER_QUERY } from "../controllers/user"
 import { Loading } from "../components/loading"
+import VerifyPage from "./verify"
+import EditNote from "./editNote"
 
 const Routes = () => {
 	const [css, theme] = useStyletron()
@@ -25,8 +25,11 @@ const Routes = () => {
 	return (
 		<div className={routeStyle}>
 			<Switch>
+				<Route path={"/verify/:url"} component={VerifyPage} />
 				<Route path={"/login/:url"} component={LoginPage} />
-				<Route path={"/note/:noteID"} component={Home} />
+				<Route path={"/verify"} component={VerifyPage} />
+				<Route path={"/login"} component={LoginPage} />
+				<Route path={"/note/:noteID"} component={EditNote} />
 				<Route path={"/"} component={Home} />
 			</Switch>
 		</div>

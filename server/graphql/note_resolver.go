@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"errors"
+	"fmt"
 	"infinote"
 	"infinote/canlog"
 	"infinote/db"
@@ -26,12 +27,23 @@ func replaceIntoString(s, rs string, index, length int) string {
 }
 
 func (r *queryResolver) Notes(ctx context.Context) ([]*db.Note, error) {
-	result, err := infinote.Notes(ctx, r.NoteStorer)
+	user, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
+	if err != nil {
+		return nil, err
+	}
+
+	uid, err := uuid.FromString(user.ID)
+	if err != nil {
+		return nil, err
+	}
+	result, err := infinote.Notes(ctx, r.NoteStorer, uid)
+
 	if errors.Is(err, infinote.ErrUnauthorized) {
 		return nil, nil
 	}
-	return result, nil
+	return result, err
 }
+
 func (r *queryResolver) NoteByID(ctx context.Context, noteID string) (*db.Note, error) {
 	if noteID == "" {
 		user, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
@@ -82,16 +94,22 @@ func (r *noteResolver) Owner(ctx context.Context, obj *db.Note) (*db.User, error
 	return result, nil
 }
 
+type Observer struct {
+	UserID         string
+	CursorPosition CursorPlacement
+	Chan           chan *NoteEvent
+}
+
 type Noteroom struct {
 	Note      *db.Note
-	Observers map[string]struct {
-		UserID string
-		Chan   chan *NoteEvent
-	}
+	Observers map[string]*Observer
 	*sync.RWMutex
 }
 
+var ErrNoNoteroom = errors.New("no noteroom created")
+
 func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*NoteEventResult, error) {
+	fmt.Println("CHANGES", input.Cursor)
 	result := &NoteEventResult{
 		Success: false,
 	}
@@ -103,8 +121,9 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 
 	noteID := input.NoteID
 	eventID := input.EventID
+	sessionID := input.SessionID
 
-	log.Println("SESSOIN ID", input.SessionID)
+	log.Println("SessionID", input.SessionID)
 
 	event := &NoteEvent{
 		NoteID:    noteID,
@@ -114,25 +133,30 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 		SessionID: input.SessionID,
 	}
 
+	fmt.Println("Locking resolver. Changing.", input.Cursor)
 	r.RLock()
-	defer r.RUnlock()
+	defer func() {
+		fmt.Println("Unlocking resolver. Changing.")
+		r.RUnlock()
+	}()
 	noteRoom, ok := r.noterooms[noteID]
 	if !ok {
-		uid, err := uuid.FromString(noteID)
-		if err != nil {
-			return nil, err
+		fmt.Println("No room.", noteID, len(r.noterooms))
+		return nil, ErrNoNoteroom
+	}
+
+	if input.Cursor != nil {
+		obv, ok := noteRoom.Observers[sessionID]
+		if !ok {
+			panic(err)
 		}
-		note, err := r.NoteStorer.Get(uid)
-		if err != nil {
-			note, err = r.newNote(user.ID)
-		}
-		noteRoom, err = r.noteRoom(note)
-		if err != nil {
-			return nil, err
+		obv.CursorPosition.LineNumber = input.Cursor.LineNumber
+		obv.CursorPosition.Column = input.Cursor.Column
+		event.Cursor = &CursorPlacement{
+			LineNumber: obv.CursorPosition.LineNumber,
+			Column:     obv.CursorPosition.Column,
 		}
 	}
-	noteRoom.Lock()
-	defer noteRoom.Unlock()
 
 	if input.Insert != nil {
 		text := input.Insert.Text
@@ -151,6 +175,16 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 		noteRoom.Note.Body = replaceIntoString(noteRoom.Note.Body, text, index, length)
 		event.Replace = &ReplaceTextNote{
 			Text:   text,
+			Index:  index,
+			Length: length,
+		}
+	}
+
+	if input.Remove != nil {
+		index := input.Remove.Index
+		length := input.Remove.Length
+		noteRoom.Note.Body = replaceIntoString(noteRoom.Note.Body, "", index, length)
+		event.Remove = &DeleteTextNote{
 			Index:  index,
 			Length: length,
 		}
@@ -180,28 +214,6 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 	return result, nil
 }
 
-func (r *Resolver) noteRoom(note *db.Note) (*Noteroom, error) {
-	r.Lock()
-	defer r.Unlock()
-	if note.ID == "" {
-		return nil, errors.New("note does not exist")
-	}
-
-	room := r.noterooms[note.ID]
-	if room == nil {
-		room = &Noteroom{
-			Note: note,
-			Observers: map[string]struct {
-				UserID string
-				Chan   chan *NoteEvent
-			}{},
-			RWMutex: &sync.RWMutex{},
-		}
-		r.noterooms[note.ID] = room
-	}
-	return room, nil
-}
-
 func (r *Resolver) newNote(userID string) (*db.Note, error) {
 	note := &db.Note{
 		OwnerID: userID,
@@ -214,8 +226,10 @@ func (r *Resolver) newNote(userID string) (*db.Note, error) {
 
 type subscriptionResolver struct{ *Resolver }
 
-func (r *subscriptionResolver) NoteEvent(ctx context.Context, noteID string) (<-chan *NoteEvent, error) {
+func (r *subscriptionResolver) NoteEvent(ctx context.Context, noteID, sessionID string) (<-chan *NoteEvent, error) {
 	var note *db.Note
+
+	fmt.Println("Subscribing...", sessionID)
 
 	user, err := infinote.UserFromContext(ctx, r.UserStorer, r.BlacklistProvider)
 
@@ -229,33 +243,48 @@ func (r *subscriptionResolver) NoteEvent(ctx context.Context, noteID string) (<-
 		}
 	}
 
-	room, err := r.noteRoom(note)
-	if err != nil {
-		return nil, err
-	}
+	fmt.Println("Checking for note", note.ID)
 
-	id, err := uuid.NewV4()
-	idStr := id.String()
-	if err != nil {
-		//TODO: find out why would newv4 ever return an error?
-		panic(err)
+	if note == nil {
+		fmt.Println("No note found")
+		return nil, errors.New("no note found")
 	}
 
 	events := make(chan *NoteEvent, 1)
 
 	go func() {
 		<-ctx.Done()
+		fmt.Println("Locking. Leaving.")
 		r.Lock()
-		defer r.Unlock()
-		delete(room.Observers, idStr)
+		room, _ := r.noterooms[noteID]
+		defer func() {
+			fmt.Println("Unlocking. Leaving")
+			r.Unlock()
+		}()
+		delete(room.Observers, sessionID)
 	}()
 
+	fmt.Println("Locking. Entering.")
 	r.Lock()
-	defer r.Unlock()
-	room.Observers[idStr] = struct {
-		UserID string
-		Chan   chan *NoteEvent
-	}{UserID: user.ID, Chan: events}
+	defer func() {
+		fmt.Println("Unlocking. Entering")
+		r.Unlock()
+	}()
+	room, ok := r.noterooms[noteID]
+	if !ok {
+		room = &Noteroom{
+			Note:      note,
+			Observers: map[string]*Observer{},
+			RWMutex:   &sync.RWMutex{},
+		}
+		fmt.Println("Noteroom created")
+		r.noterooms[note.ID] = room
+	}
+
+	room.Observers[sessionID] = &Observer{UserID: user.ID, Chan: events, CursorPosition: CursorPlacement{
+		LineNumber: 0,
+		Column:     0,
+	}}
 
 	return events, nil
 }

@@ -40,8 +40,9 @@ const useAuth = () => {
 	if (!check.checked && !loading) {
 		setChecked({ checked: true, checking: false })
 		setLoading(false)
+
 		if (data && data.me) {
-			setLoggedIn(data.me.verified)
+			setLoggedIn(true)
 			setUser(data.me)
 			setVerified(data.me.verified)
 		} else {
@@ -87,16 +88,15 @@ const useAuth = () => {
 		return
 	}
 
-	const verify = async (token: string) => {
+	const verify = async (token: string, email: string) => {
 		await setLoading(true)
 		const response = await fetch("/api/auth/verify_account", {
 			method: "POST",
-			body: JSON.stringify({ token })
+			body: JSON.stringify({ token, email })
 		})
 		if (response.status === 200) {
 			setLoading(false)
-			resetClient()
-			clearAuthErrors()
+			setUser({ ...data.me, verified: true })
 			setLoggedIn(true)
 			setShowVerifyComplete(true)
 			return

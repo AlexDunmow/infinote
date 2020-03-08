@@ -35,7 +35,7 @@ export interface ErrorMap {
 	[key: string]: string
 }
 
-export interface Note {
+export interface INote {
 	id: string
 	name: string
 	body: string
@@ -64,6 +64,12 @@ export interface ReplaceText {
 	length: number
 }
 
+export interface DeleteText {
+	index: number
+	length: number
+}
+
+//whenever you change this, you need to update the graphql
 export interface NoteEvent {
 	noteID: string
 	eventID: string
@@ -71,6 +77,7 @@ export interface NoteEvent {
 	insert?: NoteInsert
 	cursor?: CursorPlacement
 	replace?: ReplaceText
+	remove?: DeleteText
 	userID: string
 	userName: string
 }
@@ -81,5 +88,6 @@ export interface NoteChange {
 	sessionID: string
 	insert?: NoteInsert
 	replace?: ReplaceText
+	remove?: DeleteText
 	cursor?: CursorPlacement
 }

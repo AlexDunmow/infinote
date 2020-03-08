@@ -1,10 +1,10 @@
 package infinote
 
 import (
-	"infinote/canlog"
-	"infinote/db"
 	"context"
 	"fmt"
+	"infinote/canlog"
+	"infinote/db"
 
 	"github.com/gofrs/uuid"
 )
@@ -20,8 +20,9 @@ func UserNotesSelect(ctx context.Context, ts NoteStorer, ownerID uuid.UUID, limi
 }
 
 // Notes gets all Notes
-func Notes(ctx context.Context, ts NoteStorer) ([]*db.Note, error) {
-	result, err := ts.All()
+func Notes(ctx context.Context, ts NoteStorer, ownerID uuid.UUID) ([]*db.Note, error) {
+	result, err := ts.GetByUser(ownerID)
+
 	if err != nil {
 		canlog.AppendErr(ctx, "dae3d21f-921a-4232-89e3-ff00b94d1230")
 		return nil, fmt.Errorf("list Note: %w", err)

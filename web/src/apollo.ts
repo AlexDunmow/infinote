@@ -4,6 +4,7 @@ import { WebSocketLink } from "apollo-link-ws"
 import { SubscriptionClient } from "subscriptions-transport-ws"
 import { createUploadLink } from "apollo-upload-client"
 import { onError } from "apollo-link-error"
+import { DefinitionNode } from "graphql"
 
 /**
  * Additional HTTP Error Handling outside of GraphQL Response
@@ -57,31 +58,25 @@ export class ApolloLinkSplitter {
 			reconnect: true,
 			connectionParams: () => {
 				return {
-					authorization: this.authToken,
+					authorization: this.authToken
 				}
-			},
+			}
 		})
 
 		this.link = ApolloLink.split(
 			(op: Operation) => {
 				// Define list of operations involving file upload here
 				return op.query.definitions.some(
-					(definition: {
-						kind: string
-						operation: string
-						name: {
-							value: string
-						}
-					}) =>
+					(definition: DefinitionNode) =>
 						definition.kind === "OperationDefinition" &&
 						definition.operation === "mutation" &&
 						definition.name &&
-						definition.name.value === "onboardingFileUpload",
+						definition.name.value === "onboardingFileUpload"
 				)
 			},
 
 			uploadLink,
-			new WebSocketLink(this.wsClient),
+			new WebSocketLink(this.wsClient)
 		)
 	}
 
