@@ -6,6 +6,7 @@ import { USER_QUERY } from "../controllers/user"
 import { Loading } from "../components/loading"
 import { AuthContainer } from "../controllers/auth"
 import { Redirect } from "react-router"
+import { useParams } from "react-router-dom"
 
 const LogoPath = require("../assets/images/logo.svg")
 
@@ -40,6 +41,9 @@ const LoginPage = () => {
 		maxWidth: "90px"
 	})
 
+	const { url } = useParams<{ url: string }>()
+	const redirect = atob(url)
+
 	return (
 		<Container>
 			<FormContainer>
@@ -50,7 +54,7 @@ const LoginPage = () => {
 						<h1>Infinote</h1>
 					</Logo>
 				)}
-				<Login />
+				<Login redirect={redirect} />
 			</FormContainer>
 		</Container>
 	)

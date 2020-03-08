@@ -26,6 +26,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/lib/pq v1.0.0
+	github.com/minio/highwayhash v1.0.0
 	github.com/ninja-software/go-check-passwd v0.0.0-20191023080747-0879e647a3ab
 	github.com/oklog/run v1.0.0
 	github.com/opencontainers/runc v0.1.1 // indirect
@@ -45,6 +46,7 @@ require (
 	github.com/volatiletech/sqlboiler v3.6.0+incompatible
 	go.uber.org/zap v1.13.0
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
+	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/urfave/cli.v2 v2.0.0-20190806201727-b62605953717 // indirect
 	syreclabs.com/go/faker v1.2.0

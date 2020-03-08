@@ -18,14 +18,14 @@ const Routes = () => {
 	const auth = AuthContainer.useContainer()
 
 	if (!auth.check.checked || auth.check.checking) {
-		console.log("auth", auth)
+		console.log("auth not checked", auth)
 		return <Loading />
 	}
 
 	return (
 		<div className={routeStyle}>
 			<Switch>
-				<Route path={"/login"} exact component={LoginPage} />
+				<Route path={"/login/:url"} component={LoginPage} />
 				<Route path={"/note/:noteID"} component={Home} />
 				<Route path={"/"} component={Home} />
 			</Switch>

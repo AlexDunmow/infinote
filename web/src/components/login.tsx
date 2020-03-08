@@ -15,13 +15,12 @@ import { Loading } from "./loading"
 
 interface Props {
 	setShowLogin?: (showLogin: boolean) => void
+	redirect?: string
 }
 // must supply setShowLogin if using with the animated login as it uses this prop to know when its being hidden.
 // cancel button will redirect to home when this prop is not provided.
 
-export const Login = (props: Props) => {
-	const { setShowLogin } = props
-
+export const Login = ({ setShowLogin, redirect }: Props) => {
 	const history = useHistory()
 
 	const [css, theme] = useStyletron()
@@ -56,7 +55,11 @@ export const Login = (props: Props) => {
 		}
 
 		setInputError({})
-		login(email, password)
+		login(email, password).then(() => {
+			if (redirect) {
+				history.push(redirect)
+			}
+		})
 	}
 
 	const handleCancel = () => {

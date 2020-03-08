@@ -82,7 +82,7 @@ type TextInsert {
 type ReplaceTextNote {
 	text: String!
 	index: Int!
-	end: Int!
+	length: Int!
 }
 
 type NoteEvent {
@@ -128,7 +128,7 @@ input InsertNote {
 input TextRplaceInput {
 	index: Int!
 	text: String!
-	end: Int!
+	length: Int!
 }
 
 input NoteChange {

@@ -26,6 +26,11 @@ const SUB = gql`
 				lineNumber
 				column
 			}
+			replace {
+				length
+				index
+				text
+			}
 			userID
 			userName
 		}
@@ -64,7 +69,7 @@ const NoteEditor = ({ note }: Props) => {
 
 	const [contentManager, setContentManager] = useState<EditorContentManager>()
 
-	const [insertText, insData] = useMutation<{ NoteChange: boolean }, { input: NoteChange }>(NOTECHANGE)
+	const [changeNote, insData] = useMutation<{ NoteChange: boolean }, { input: NoteChange }>(NOTECHANGE)
 	const { data, loading } = useSubscription<{ NoteEvent: NoteEvent }>(SUB, { variables: { noteID: note.id } })
 
 	function handleEditorDidMount(_: any, editor: ICodeEditor) {
@@ -83,12 +88,27 @@ const NoteEditor = ({ note }: Props) => {
 			editor: editor as any,
 			onReplace(index, length, text) {
 				console.log("Replace", index, length, text)
+				const eventID = randomID()
+				changeNote({
+					variables: {
+						input: {
+							noteID: note.id,
+							sessionID,
+							eventID,
+							replace: {
+								text,
+								length,
+								index
+							}
+						}
+					}
+				})
 			},
 			onInsert(index, text) {
 				console.log("Insert", index, text)
 				const eventID = randomID()
 
-				insertText({
+				changeNote({
 					variables: {
 						input: {
 							noteID: note.id,

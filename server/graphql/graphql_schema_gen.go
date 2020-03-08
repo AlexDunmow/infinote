@@ -117,9 +117,9 @@ type ComplexityRoot struct {
 	}
 
 	ReplaceTextNote struct {
-		End   func(childComplexity int) int
-		Index func(childComplexity int) int
-		Text  func(childComplexity int) int
+		Index  func(childComplexity int) int
+		Length func(childComplexity int) int
+		Text   func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -470,19 +470,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity), true
 
-	case "ReplaceTextNote.end":
-		if e.complexity.ReplaceTextNote.End == nil {
-			break
-		}
-
-		return e.complexity.ReplaceTextNote.End(childComplexity), true
-
 	case "ReplaceTextNote.index":
 		if e.complexity.ReplaceTextNote.Index == nil {
 			break
 		}
 
 		return e.complexity.ReplaceTextNote.Index(childComplexity), true
+
+	case "ReplaceTextNote.length":
+		if e.complexity.ReplaceTextNote.Length == nil {
+			break
+		}
+
+		return e.complexity.ReplaceTextNote.Length(childComplexity), true
 
 	case "ReplaceTextNote.text":
 		if e.complexity.ReplaceTextNote.Text == nil {
@@ -746,7 +746,7 @@ type TextInsert {
 type ReplaceTextNote {
 	text: String!
 	index: Int!
-	end: Int!
+	length: Int!
 }
 
 type NoteEvent {
@@ -792,7 +792,7 @@ input InsertNote {
 input TextRplaceInput {
 	index: Int!
 	text: String!
-	end: Int!
+	length: Int!
 }
 
 input NoteChange {
@@ -2529,7 +2529,7 @@ func (ec *executionContext) _ReplaceTextNote_index(ctx context.Context, field gr
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ReplaceTextNote_end(ctx context.Context, field graphql.CollectedField, obj *ReplaceTextNote) (ret graphql.Marshaler) {
+func (ec *executionContext) _ReplaceTextNote_length(ctx context.Context, field graphql.CollectedField, obj *ReplaceTextNote) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -2548,7 +2548,7 @@ func (ec *executionContext) _ReplaceTextNote_end(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.End, nil
+		return obj.Length, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4272,9 +4272,9 @@ func (ec *executionContext) unmarshalInputTextRplaceInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "end":
+		case "length":
 			var err error
-			it.End, err = ec.unmarshalNInt2int(ctx, v)
+			it.Length, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4802,8 +4802,8 @@ func (ec *executionContext) _ReplaceTextNote(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "end":
-			out.Values[i] = ec._ReplaceTextNote_end(ctx, field, obj)
+		case "length":
+			out.Values[i] = ec._ReplaceTextNote_length(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

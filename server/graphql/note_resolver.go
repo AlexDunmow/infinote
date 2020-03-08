@@ -13,7 +13,16 @@ import (
 )
 
 func insertIntoString(s, is string, index int) string {
-	return s[:index] + is + s[index:]
+	runes := []rune(s)
+	return string(runes[:index]) + is + string(runes[index:])
+}
+
+func replaceIntoString(s, rs string, index, length int) string {
+	runes := []rune(s)
+
+	news := string(runes[:index]) + rs + string(runes[index+length:])
+
+	return news
 }
 
 func (r *queryResolver) Notes(ctx context.Context) ([]*db.Note, error) {
@@ -138,14 +147,21 @@ func (r *mutationResolver) NoteChange(ctx context.Context, input NoteChange) (*N
 	if input.Replace != nil {
 		text := input.Replace.Text
 		index := input.Replace.Index
-		end := input.Replace.End
-		noteRoom.Note.Body = insertIntoString(noteRoom.Note.Body, text, index)
+		length := input.Replace.Length
+		noteRoom.Note.Body = replaceIntoString(noteRoom.Note.Body, text, index, length)
 		event.Replace = &ReplaceTextNote{
-			Text:  text,
-			Index: index,
-			End:   end,
+			Text:   text,
+			Index:  index,
+			Length: length,
 		}
 	}
+
+	_, err = r.NoteStorer.Update(noteRoom.Note)
+	if err != nil {
+		panic(err)
+	}
+
+	// no more actual text changes
 
 	if input.Cursor != nil {
 		cursor := input.Cursor

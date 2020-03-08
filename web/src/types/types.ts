@@ -61,7 +61,7 @@ export interface NoteInsert {
 export interface ReplaceText {
 	text: string
 	index: number
-	end: number
+	length: number
 }
 
 export interface NoteEvent {
@@ -80,5 +80,6 @@ export interface NoteChange {
 	eventID: string
 	sessionID: string
 	insert?: NoteInsert
+	replace?: ReplaceText
 	cursor?: CursorPlacement
 }

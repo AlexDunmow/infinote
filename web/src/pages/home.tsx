@@ -71,8 +71,22 @@ export const Home = (props: IProps) => {
 			"auth.loading:",
 			auth.loading,
 			"data:",
-			data
+			data,
+			"error:",
+			error,
+			"logged in:",
+			auth.loggedIn
 		)
+
+		// auth.check.checked: true auth.check.checking false loading: true auth.loading: false data: {} error: undefined logged in: false
+		// home.tsx?d54c:64 auth.check.checked: true auth.check.checking false loading: true auth.loading: false data: {} error: undefined logged in: false
+
+		if (auth.check.checked && !auth.loggedIn) {
+			console.log("redirecting?")
+			const url = btoa(window.location.pathname)
+			return <Redirect to={`/login/${url}`} />
+		}
+
 		return (
 			<div>
 				Loading Note...

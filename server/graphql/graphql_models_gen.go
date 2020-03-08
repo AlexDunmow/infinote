@@ -72,9 +72,9 @@ type PageInfo struct {
 }
 
 type ReplaceTextNote struct {
-	Text  string `json:"text"`
-	Index int    `json:"index"`
-	End   int    `json:"end"`
+	Text   string `json:"text"`
+	Index  int    `json:"index"`
+	Length int    `json:"length"`
 }
 
 type RequestToken struct {
@@ -88,9 +88,9 @@ type TextInsert struct {
 }
 
 type TextRplaceInput struct {
-	Index int    `json:"index"`
-	Text  string `json:"text"`
-	End   int    `json:"end"`
+	Index  int    `json:"index"`
+	Text   string `json:"text"`
+	Length int    `json:"length"`
 }
 
 type UpdateNote struct {

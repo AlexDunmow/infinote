@@ -20,12 +20,15 @@ const Changes = ({ sessionID, contentManager, history, event, setHistory }: Prop
 		const newHistory = [...history, eventID]
 		setHistory(newHistory)
 
+		console.log("EVENT!!!!!", event)
+
 		if (event.NoteEvent.sessionID !== sessionID) {
 			if (insert) {
 				contentManager.insert(insert.index, insert.text)
 			}
 			if (replace) {
-				contentManager.replace(5, 10, "some text")
+				console.log("REPLACING!!!!")
+				contentManager.replace(replace.index, replace.length, replace.text)
 			}
 		}
 	}
